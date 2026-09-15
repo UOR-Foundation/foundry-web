@@ -70,8 +70,11 @@ publication and actual outcomes are separate evidence.
 
 ## Browser network and bootstrap
 
-Execution and replication use faculty and participant browser sessions only.
-Dedicated Foundation nodes and hidden service backends are not authorized.
+Deployed service execution and peer replication use faculty and participant
+browser sessions only. Dedicated Foundation nodes and hidden service backends
+are not authorized. Development and bootstrap release builds use repository
+devcontainers and locked SDK CI; this does not authorize server-side substitutes
+for portal functions or establish browser-resident build/CI acceptance.
 Kappa provides the modeled decentralized object space, queries, references,
 and service artifacts; a browser runtime executes the artifacts.
 
@@ -105,7 +108,10 @@ and evidence invalidation are explicit; no silent fallback changes the model.
 
 Authority comes from accepted models, authenticated records, and authorized
 decisions, not a browser, registry hash, or generated response alone.
-Views enforce permissions for content, metadata, queries, edges, and effects.
+Object, query, peer-protocol, and effect boundaries independently enforce
+permissions; a caller cannot bypass them by avoiding a View. Views expose only
+authorized content, metadata, queries, edges, and actions. Negative tests must
+exercise unauthorized raw requests as well as interface interactions.
 Publicly delivered assets contain no private credentials or organizational data.
 
 The data model distinguishes local work, replicated durable acceptance, and
