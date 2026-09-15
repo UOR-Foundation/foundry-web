@@ -28,6 +28,30 @@ scenario, failing test, complete implementation, and verification evidence.
 Only then may its conformance register claim the evidenced capability.
 No row is a deferral, exclusion, or reduced definition of done.
 
+## Kappa/Veilid baseline
+
+Source inspection, not execution or accepted conformance:
+
+- Kappa [2af86560](https://github.com/UOR-Foundation/kappa-registry/tree/2af86560a177fc9651b6c0e92e7974140ed77dd5)
+  locks Rekindle `3fb5b80f2d5d3d5b5a59dded1a56b477cb9f23ca` and Veilid 0.5.7.
+  Kappa owns object identity, storage, references, queries, and authorization;
+  Rekindle adapts Veilid routing, DHT records, and application messages.
+- The optional [Kappa startup](https://github.com/UOR-Foundation/kappa-registry/blob/2af86560a177fc9651b6c0e92e7974140ed77dd5/crates/kappa-server/src/main.rs#L748)
+  discards the inbound channel. Its [reconciliation loop](https://github.com/UOR-Foundation/kappa-registry/blob/2af86560a177fc9651b6c0e92e7974140ed77dd5/crates/kappa-transport-veilid/src/reconcile.rs#L146)
+  copies tags, not referenced blob bytes. These paths do not establish
+  authenticated end-to-end replication, conflict handling, or recovery.
+- Veilid 0.5.7 has a [browser transport](https://gitlab.com/veilid/veilid/-/blob/f5cdcca38cecf4845eb9bd5e21ddca382a357a75/veilid-core/src/network_manager/network/wasm/protocol/mod.rs)
+  using outbound WS/WSS, without inbound listeners or implemented WebRTC.
+  Reachable transport peers are therefore a dependency of that path, distinct
+  from application hosting. GitHub Pages bootstrap does not supply them.
+
+Required modeled work includes authenticated peer/content discovery, inbound
+dispatch, verified blob transfer, durable replica receipts, conflict/revocation
+rules, repair, and browser-native storage/execution. Test the complete path
+across networks and peer failures. Inventory relay/bootstrap dependencies;
+participant-only service execution and independent-network acceptance remain
+unchanged. Hologram's WebRTC path is not evidence about Veilid's capabilities.
+
 ## Verification of the bootstrap
 
 - Whitespace checks passed; inherited agent policy, bootstrap workflow, and
