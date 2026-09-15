@@ -64,11 +64,14 @@ automatically valid assumptions for Foundry's browser-session deployment.
 At that revision, the Hologram devcontainer passed:
 
 - `bash vv/suites/cc40-product-security.sh`: eight tests, none ignored.
-- `bash vv/suites/cc38-content-net.sh`: four exchange/tampering tests, none
-  ignored; bare-metal and browser-target compatibility builds.
+- `bash vv/suites/cc38-content-net.sh`: four in-process exchange/tampering
+  tests, none ignored; bare-metal and browser-target compatibility builds,
+  not cross-network browser deployment tests.
 
 These witness the tested properties, not large-scale availability, hostile
 storage confidentiality, or resistance to a compromised initial verifier.
+CC-40's public-key identity and roster checks do not demonstrate private-key
+possession, authenticated sessions, or Foundation role admission.
 Foundry must bind inherited claims to their exact evidence and validate
 changed assumptions explicitly.
 
