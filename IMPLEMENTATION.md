@@ -61,11 +61,16 @@ identifies open public-network abuse economics and durability/replication policy
 Operator-owned storage and NIC-capable egress peers in the former are not
 automatically valid assumptions for Foundry's browser-session deployment.
 
-At that revision, `bash vv/suites/cc40-product-security.sh` passed all eight
-tests in the Hologram devcontainer, with none ignored. This witnesses the
-tested properties, not large-scale availability, hostile storage confidentiality,
-or resistance to a compromised initial verifier. Foundry must bind inherited
-claims to their exact evidence and validate changed assumptions explicitly.
+At that revision, the Hologram devcontainer passed:
+
+- `bash vv/suites/cc40-product-security.sh`: eight tests, none ignored.
+- `bash vv/suites/cc38-content-net.sh`: four exchange/tampering tests, none
+  ignored; bare-metal and browser-target compatibility builds.
+
+These witness the tested properties, not large-scale availability, hostile
+storage confidentiality, or resistance to a compromised initial verifier.
+Foundry must bind inherited claims to their exact evidence and validate
+changed assumptions explicitly.
 
 ## Verification of the bootstrap
 
