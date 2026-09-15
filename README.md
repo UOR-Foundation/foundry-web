@@ -11,6 +11,8 @@ Foundry is also the Foundation's headquarters.
 Repository bootstrap only, created from
 [UOR template](https://github.com/UOR-Foundation/template/tree/e0e11ecb1b38e202116d9806887363848629d439).
 No application capability or production deployment is accepted yet.
+The required scope is in [SPEC.md](SPEC.md); remaining work is tracked in
+[IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 The inherited `prismpm.lock` and `template.lock` are absent. The devcontainer
 and complete `just vv` gate require an accepted immutable SDK release;
