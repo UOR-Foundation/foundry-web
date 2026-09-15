@@ -49,8 +49,23 @@ Required modeled work includes authenticated peer/content discovery, inbound
 dispatch, verified blob transfer, durable replica receipts, conflict/revocation
 rules, repair, and browser-native storage/execution. Test the complete path
 across networks and peer failures. Inventory relay/bootstrap dependencies;
-participant-only service execution and independent-network acceptance remain
-unchanged. Hologram's WebRTC path is not evidence about Veilid's capabilities.
+faculty/participant browser-only service execution and peer replication remain
+required. Hologram's WebRTC path is not evidence about Veilid's capabilities.
+
+## Holospaces threat-model inputs
+
+Reuse the [threat model](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/specs/holospaces/src/arc42/adoc/13_product_security.adoc)
+and its witnesses alongside the [network design](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/specs/refactor/04-networks.md).
+The latter distinguishes restricted access from private encrypted content and
+identifies open public-network abuse economics and durability/replication policy.
+Operator-owned storage and NIC-capable egress peers in the former are not
+automatically valid assumptions for Foundry's browser-session deployment.
+
+At that revision, `bash vv/suites/cc40-product-security.sh` passed all eight
+tests in the Hologram devcontainer, with none ignored. This witnesses the
+tested properties, not large-scale availability, hostile storage confidentiality,
+or resistance to a compromised initial verifier. Foundry must bind inherited
+claims to their exact evidence and validate changed assumptions explicitly.
 
 ## Verification of the bootstrap
 
