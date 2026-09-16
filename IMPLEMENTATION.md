@@ -88,6 +88,14 @@ and last-replica-loss evidence against its modeled recovery obligations.
 
 ## Verification of the bootstrap
 
+- On 15 September 2026, GitHub's Pages API confirmed Actions deployment
+  (`build_type: workflow`) and the verified custom domain `app.uor.foundation`.
+  Its health check reported `InvalidDNSError`/`NXDomain`; no HTTPS certificate
+  was available and HTTPS enforcement was false. Deployment remains unaccepted.
+  The DNS owner must configure `app` as a CNAME to `uor-foundation.github.io`,
+  then certificate issuance and HTTPS enforcement must be verified. For Actions
+  deployments, a repository `CNAME` file does not configure DNS; see
+  [GitHub's domain contract](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-a-subdomain).
 - Whitespace checks passed; inherited agent policy, bootstrap workflow, and
   generated conformance document remain byte-identical to the template.
 - [CI at a006253](https://github.com/UOR-Foundation/foundry-web/actions/runs/34928559731)
