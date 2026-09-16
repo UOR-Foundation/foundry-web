@@ -75,6 +75,17 @@ possession, authenticated sessions, or Foundation role admission.
 Foundry must bind inherited claims to their exact evidence and validate
 changed assumptions explicitly.
 
+Additional inspected witnesses, not rerun here, include real loopback
+[TCP/DHT exchanges](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/crates/hologram-net/tests/uor_native_dht.rs)
+and [CC-49 browser WebRTC](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/spaces/holospaces-browser/web/webrtc-content-net-test.mjs).
+CC-49 uses two Chromium contexts, host ICE, and harness-carried signaling;
+it does not establish cross-NAT or geographically distributed operation.
+The [DHT implementation](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/crates/hologram-net/src/tcp/dht.rs#L82-L104)
+retains incumbent entries without liveness probes. Neither these tests nor
+cache-on-fetch establish churn/eclipsing resistance or durable replica policy.
+Foundry acceptance still requires adversarial churn/partition, browser eviction,
+and last-replica-loss evidence against its modeled recovery obligations.
+
 ## Verification of the bootstrap
 
 - Whitespace checks passed; inherited agent policy, bootstrap workflow, and
