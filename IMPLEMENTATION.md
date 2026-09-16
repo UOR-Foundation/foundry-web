@@ -21,6 +21,15 @@ verification and actual never-started image captures match for AMD64 and ARM64.
 The SDK's normal template and lock checks pass; template update reports no
 change. These establish the binding, not producer or production acceptance.
 
+The complete current scaffold `just vv` passed on native AMD64 at
+`2c92874ba5d9ff30a9516cd3a1671adf57984834` in that exact SDK, including
+formatting, template/model checks, tests, Clippy, all-feature compilation, and
+dependency advisories. Log SHA-256:
+`3166cff729f90eb82037fd71216c413fa0a6e2cd351a79f5361751b0de72d344`.
+The register contains zero publisher/product capabilities; this pass does not
+establish portal publication. ARM64 CI and every publication requirement above
+remain separate checks. No reduced release gate was introduced.
+
 On 16 September 2026, the application model and 19 source/configuration/test
 files moved byte-for-byte to `uor-foundry`, together with the application
 register and gate. The publisher no longer owns draft-preview semantics or
