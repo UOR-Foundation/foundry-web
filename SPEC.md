@@ -1,150 +1,92 @@
-# Foundry portal requirements
+# Foundry publication requirements
 
-This is the required product contract, not evidence of implementation.
-Application semantics must be authored in Prism/LexLean; generated outputs
-and this requirements document cannot substitute for the accepted model.
+The complete product contract belongs to
+[uor-foundry](https://github.com/UOR-Foundation/uor-foundry/blob/main/SPEC.md).
+This repository publishes that product; it is not a second Foundation model.
 
-## Purpose and ownership
+## Ownership
 
-The UOR Foundation is dedicated to the democratization of technology for
-the well-being of humanity. It operates under the Citizen Gardens model
-through a network of physical Foundries; the first also houses Foundation HQ.
-No location, legal structure, financial policy, or additional authority is
-inferred from that mission.
+`uor-foundry` owns organizational and site definitions, controls, services,
+workflows, permissions, stakeholder Views, and product acceptance. It builds
+the complete portal with the PrismPM SDK and prism-stdlib.
 
-`uor-foundry` owns the Foundation/site model. `foundry-web` consumes that
-model through the PrismPM SDK and prism-stdlib to produce `app.uor.foundation`.
-Reusable capabilities belong upstream, not in a vendored SDK or handwritten
-application fallback. All implementation semantics flow through LexLean,
-generated Lean, and lean4-prod, including the Holo profile and browser Views.
+`foundry-web` owns immutable producer/SDK release bindings, approved target
+configuration, publication, and independent deployed-artifact verification.
+It must not duplicate application source, maintain handwritten UI or service
+logic, redefine organizational controls, or patch generated assets.
 
-## Complete scope
+Reusable artifact acquisition, trust verification, and deployment adapters
+belong upstream in PrismPM. No vendored SDK, Git/path dependency substitute,
+or workflow-only implementation may bypass its public contract.
 
-The portal is the authoritative interaction point for faculty, participants,
-and all other modeled stakeholder roles. It must provide the Foundation's
-digital presence and operations, including:
+## Release boundary
 
-- concept-to-production Prism workflows, Git, CI, hosting, and scheduling;
-- AI inference, agentic execution, notebooks, and knowledge management;
-- text and multimedia messaging, collaboration, and content creation;
-- administration, governance, change management, and improvement;
-- business planning, operating procedures, finances, and payments;
-- learning, assessment, certification, and their authority records; and
-- brand identity, approved descriptions, brand kits, and accessible presentation.
+The SDK must acquire an exact verified `uor-foundry` release, not a moving
+branch, tag, arbitrary build directory, or unchecked workflow artifact.
+The release and verification evidence bind:
 
-This list does not replace standards-derived coverage of the whole
-organization. Physical-site responsibilities and human activities remain
-modeled obligations with appropriate assessment evidence.
+- producer repository and exact source revision;
+- authoritative model identity and complete service/dependency closure;
+- controls, inherited obligations, assessments, and release-state evidence;
+- locked SDK, compiler, runtime, and oracle identities; and
+- exact generated portal artifact tree and approved deployment configuration.
 
-Each service must define its actors, permissions, inputs, outputs, state,
-effects, resource requirements, failure/recovery behavior, and acceptance.
-An interface, mock, third-party link, or generated document is not a service
-implementation. AI output is a proposal until the applicable workflow
-authorizes and verifies its effects. Recording a payment or assessment is
-not evidence of settlement or certification by an independent authority.
+Verify artifact integrity, producer identity, authorization, evidence validity,
+and acceptance independently. A signed SDK, valid digest, signature count,
+or passing schema cannot establish full Foundry acceptance. Reject partial
+or draft-preview releases, missing evidence, and mismatched model or artifacts.
 
-## Controls and standards
+The producer must pass all pre-publication product gates before a separately
+authorized deployment. Record the exact live checks that can run only after
+deployment; no other unfinished work may enter that state. Final acceptance
+requires all those checks and remaining operational assessments to pass for
+the exact deployed release. This follows the producer's explicit
+producer-ready, deployment-authorized, and accepted states, without inventing
+a first-release exception or claiming deployment evidence before it exists.
 
-All facets are governed through OSCAL catalogs, resolved profiles, component
-and system implementation records, and assessment evidence. Every applicable
-control must have a verified local implementation, verified inheritance, or
-both. Inheritance identifies provider scope, exact subjects and revisions,
-evidence, validity conditions, and consumer responsibilities.
+Publish verified, authorized bytes without rebuilding or rewriting them. If a target
+requires changed assets or application behavior, the change returns to the
+producer model and its complete acceptance gate. The publisher must not
+weaken or replace the producer's acceptance requirements.
 
-The mandatory PrismPM base profile cannot be weakened by an overlay or an
-unsupported inapplicability claim. Missing implementations, planned work,
-unassessed claims, and remediation records do not satisfy mandatory controls.
+## Pages bootstrap
 
-Every adopted standard requires a complete normative-requirement inventory,
-lawfully acquired pinned sources, formal bindings, implementation mappings,
-and the complete applicable authoritative oracle/assessment coverage.
-Structural validation, test-corpus agreement, formal proof, human assessment,
-and observed operation remain distinct. Missing coverage blocks acceptance;
-it must not be hidden by narrowing the claimed standard.
+GitHub Actions publishes the verified portal under `/foundry-web/`.
+Assets, links, navigation, browser storage, and complete stakeholder journeys
+must work at that subpath without an `app.uor.foundation` dependency.
 
-The model includes human-centred design, complete accessible user journeys,
-brand rules, business planning, and operating procedures. Framework and
-design-system bindings must preserve the adopted web standards. Brand assets,
-descriptions, forecasts, and procedures are versioned and authorized; their
-publication and actual outcomes are separate evidence.
+The owner requested `https://uor.foundation/foundry-web/`. On 16 September
+2026, GitHub associated `uor.foundation` with the separate `website` project;
+the Pages API listed this repository's default address as
+`https://uor-foundation.github.io/foundry-web/`. The deployment address must
+be confirmed before release. Existing website routing must not be changed
+implicitly. The future `app.uor.foundation` address is not a prerequisite.
 
-## Browser network and bootstrap
+Pages distributes the producer's verified, authorized bootstrap closure; it does not
+supply application backends, peer transport, or proof of browser-network
+independence. The complete product's browser-only service, replication,
+recovery, and authorized migration requirements remain in force.
 
-Deployed service execution and peer replication use faculty and participant
-browser sessions only. Dedicated Foundation nodes and hidden service backends
-are not authorized. Development and bootstrap release builds use repository
-devcontainers and locked SDK CI; this does not authorize server-side substitutes
-for portal functions or establish browser-resident build/CI acceptance.
-Kappa provides the modeled decentralized object space, queries, references,
-and service artifacts; a browser runtime executes the artifacts.
+## Publication acceptance
 
-GitHub Pages initially distributes the generated `foundry-web` portal at
-`https://app.uor.foundation` and bootstraps the browser network. GitHub remains
-a modeled publication target after the network becomes independent.
-Bootstrap hosting does not authorize undisclosed external inference,
-identity, signing, agent, storage, or application-service dependencies.
+Use the template's immutable SDK/devcontainer and complete `just vv` boundary.
+Publisher tests must demonstrate rejection of substituted producer/model
+identities, absent or unaccepted evidence, incomplete or changed artifact
+trees, unauthorized targets, unsafe paths, and stale deployment results.
 
-The migration lifecycle has three distinct states:
+Upload only the verified, authorized artifact closure. Deploy it without a second
+build, under the authorized environment and credentials. Bind the deployment
+result to the exact publisher revision and producer release.
 
-1. **Bootstrap:** the accepted Pages release distributes the exact application
-   and dependency closure. External dependencies are inventoried, not concealed.
-2. **Candidate:** browser services run and gather complete migration evidence;
-   required external hosting is not removed or claimed to be unnecessary.
-3. **Independent:** an authorized transition accepts measured browser-network
-   readiness, complete control coverage, recovery, and all service acceptance.
+Verify the actual HTTPS URL, redirect destinations, complete asset bytes,
+and generated application's stakeholder journeys after deployment. URLs must
+remain within approved origins and paths; a successful deployment API response
+or HTTP 200 alone does not establish correctness. Failed live verification
+does not become accepted by updating expected bytes or omitting failed tests.
 
-Migration must demonstrate fresh-client acquisition, returning-client offline
-launch, discovery, networking, identity, compiler/oracle execution, publication,
-and recovery. DNS, TLS, signaling, relays, trust bootstrap, and counterparties
-must be identified and tested; they cannot disappear from the dependency model.
-Publication to GitHub, Cargo registries, or another external target is an
-explicit authorized network effect, not an offline completion claim.
+Rollback selects another authorized, accepted producer release through the
+same checks. Data migration and service recovery remain modeled product
+operations, not ad hoc publisher changes.
 
-Migration is not automatic after a timer, download count, or passing schema
-check. It needs exact-release evidence and an authorized decision. Rollback
-and evidence invalidation are explicit; no silent fallback changes the model.
-
-## Authority, resilience, and availability
-
-Authority comes from accepted models, authenticated records, and authorized
-decisions, not a browser, registry hash, or generated response alone.
-Object, query, peer-protocol, and effect boundaries independently enforce
-permissions; a caller cannot bypass them by avoiding a View. Views expose only
-authorized content, metadata, queries, edges, and actions. Negative tests must
-exercise unauthorized raw requests as well as interface interactions.
-Publicly delivered assets contain no private credentials or organizational data.
-
-The data model distinguishes local work, replicated durable acceptance, and
-globally confirmed effects. It defines consistency, conflict handling,
-revocation, authorized deletion, retention, replica independence, repair,
-key recovery, atomic updates, and restoration from independent copies.
-Content addressing detects identity mismatch; it does not recreate lost bytes.
-
-Internet-grade availability requires approved service-level targets, workload
-and fault bounds, measurements, and recovery objectives. Missing peers,
-suspended browsers, storage denial, deleted copies, partitions, and exhausted
-resources must be exercised. Peer outages cannot be silently removed from
-measurements. No claim permits execution without an available executor or
-recovery after every recoverable copy is destroyed.
-
-Targets and operating policies not supplied by the owner remain explicit
-acceptance inputs, not invented defaults. Their absence blocks production
-acceptance, not implementation of independent generic prerequisites.
-
-## Release acceptance
-
-The complete locked Prism model must generate every declared artifact through
-the accepted SDK, including the `.holo` runtime closure and browser projection.
-No independent handwritten UI, service, compiler, or policy implementation may
-substitute for the model. Bootstrap trust is explicit and non-circular.
-
-Acceptance requires complete control/oracle coverage, human assessment where
-required, all service journeys, negative/mutation tests, two clean reproducible
-builds, actual browser execution, recovery and fault tests, and verification
-of the deployed bytes at `app.uor.foundation`. All evidence binds exact inputs,
-subjects, tools, policies, and results. Empty registers cannot establish this.
-
-Development and verification use repository devcontainers; consumer acceptance
-uses the immutable SDK lock. Preserve template policy, keep build/cache output
-untracked, and make atomic Conventional Commits. Push reviewed increments to
-`main` when permitted; use upstream PRs where required and inspect their CI.
+Keep generated/cache output untracked. Preserve template policy and use atomic
+Conventional Commits, pushing to main where permitted and PRs where required.

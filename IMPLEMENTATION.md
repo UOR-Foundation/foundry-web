@@ -1,109 +1,37 @@
-# Implementation status
+# Publication status
 
-The required scope is [SPEC.md](SPEC.md). No application capability is
-accepted. The template scaffold is not a running Foundry service.
+No Foundry portal deployment is accepted. The complete product requirements
+and implementation work are owned by
+[uor-foundry](https://github.com/UOR-Foundation/uor-foundry/blob/main/SPEC.md).
+[SPEC.md](SPEC.md) defines this repository's publication boundary.
 
-| Required work | Owner | Status |
-| --- | --- | --- |
-| Accepted public compiler/runtime dependency closure and Prism SDK | Upstream repositories | Blocked: package gate cannot resolve `uor-hologram`; no accepted SDK lock |
-| SDK/template locks, devcontainer, and full acceptance CI | template, foundry-web | Blocked on accepted SDK |
-| Complete OSCAL bindings, profile resolution, inheritance, assessments, and oracles | PrismPM, prism-stdlib | Required |
-| Complete browser-resident SDK, compilers, oracles, and provider-independent signing | PrismPM and compiler/runtime repositories | Required |
-| Foundation, Foundry, stakeholder, authority, and organizational models | uor-foundry | Required |
-| Approved standards editions, policies, rights, and assessment inputs | Foundation/model owners | Required; mission alone does not supply these |
-| Human-centred design, accessible authoring and user journeys, brands, and presentation | prism-stdlib, foundry-web | Required |
-| Browser Kappa services, authorization, durable events, queries, and provenance | kappa-registry, PrismPM | Required |
-| Faculty/participant browser networking, discovery, peer replication, recovery, and measured availability | Kappa/runtime models, foundry-web | Required |
-| Exact-release Pages bootstrap and authorized independence/rollback lifecycle | PrismPM, foundry-web | Required |
-| Git, CI, hosting, scheduling, Prism pipeline, and publication adapters | PrismPM, foundry-web | Required |
-| AI inference, agent harnesses, notebooks, and knowledge management | PrismPM, foundry-web | Required |
-| Text/multimedia messaging, collaboration, and content creation | PrismPM, foundry-web | Required |
-| Administration, governance, change management, and improvement | uor-foundry, foundry-web | Required |
-| Business plan, operating procedures, finances, and payments | uor-foundry, foundry-web | Required |
-| Learning, assessment, certification, and authority lifecycle | uor-foundry, foundry-web | Required |
-| Complete oracle coverage, mutation evidence, browser journeys, fault/recovery and live deployment verification | All implementing repositories | Required |
+| Required work | Status |
+| --- | --- |
+| Accepted immutable SDK and template binding | Blocked: production dependency closure cannot resolve `uor-hologram`; draft PR #3 is not acceptance |
+| Complete producer model, services, controls, and pre-publication evidence | Required in uor-foundry; no producer-ready full portal release exists |
+| SDK acquisition and verification of the exact producer release/artifact closure | Required; existing OCI transport is not evidence of complete publisher integration |
+| Approved target and authorized deployment decision | Required; requested domain routing is not configured |
+| Actions upload/deploy of unchanged verified assets | Required; no draft-preview deployment substitutes for the product |
+| Independent live identity, byte, role/journey, negative, and rollback checks | Required; final acceptance cannot precede these |
 
-Each implementation increment must add its modeled capability, behavioral
-scenario, failing test, complete implementation, and verification evidence.
-Only then may its conformance register claim the evidenced capability.
-No row is a deferral, exclusion, or reduced definition of done.
+The draft binds development candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
+from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`, using template policy
+`a21a5426c290aeac92df1c0b1c63d9701420ae68`. Independent signature/provenance
+verification and actual never-started image captures match for AMD64 and ARM64.
+The SDK's normal template and lock checks pass; template update reports no
+change. These establish the binding, not producer or production acceptance.
 
-## Kappa/Veilid baseline
+On 16 September 2026, the application model and 19 source/configuration/test
+files moved byte-for-byte to `uor-foundry`, together with the application
+register and gate. The publisher no longer owns draft-preview semantics or
+claims. This is an ownership correction, not product acceptance.
 
-Source inspection, not execution or accepted conformance:
+GitHub's Pages API reports Actions deployment and no repository custom domain.
+Its default URL is `https://uor-foundation.github.io/foundry-web/`.
+`uor.foundation` is attached to the separate `website` project, so the requested
+`https://uor.foundation/foundry-web/` needs an explicit routing decision.
+Both Foundry URLs currently return HTTP 404. No existing website configuration
+was changed; `app.uor.foundation` is not required for bootstrap.
 
-- Kappa [2af86560](https://github.com/UOR-Foundation/kappa-registry/tree/2af86560a177fc9651b6c0e92e7974140ed77dd5)
-  locks Rekindle `3fb5b80f2d5d3d5b5a59dded1a56b477cb9f23ca` and Veilid 0.5.7.
-  Kappa owns object identity, storage, references, queries, and authorization;
-  Rekindle adapts Veilid routing, DHT records, and application messages.
-- The optional [Kappa startup](https://github.com/UOR-Foundation/kappa-registry/blob/2af86560a177fc9651b6c0e92e7974140ed77dd5/crates/kappa-server/src/main.rs#L748)
-  discards the inbound channel. Its [reconciliation loop](https://github.com/UOR-Foundation/kappa-registry/blob/2af86560a177fc9651b6c0e92e7974140ed77dd5/crates/kappa-transport-veilid/src/reconcile.rs#L146)
-  copies tags, not referenced blob bytes. These paths do not establish
-  authenticated end-to-end replication, conflict handling, or recovery.
-- Veilid 0.5.7 has a [browser transport](https://gitlab.com/veilid/veilid/-/blob/f5cdcca38cecf4845eb9bd5e21ddca382a357a75/veilid-core/src/network_manager/network/wasm/protocol/mod.rs)
-  using outbound WS/WSS, without inbound listeners or implemented WebRTC.
-  Reachable transport peers are therefore a dependency of that path, distinct
-  from application hosting. GitHub Pages bootstrap does not supply them.
-
-Required modeled work includes authenticated peer/content discovery, inbound
-dispatch, verified blob transfer, durable replica receipts, conflict/revocation
-rules, repair, and browser-native storage/execution. Test the complete path
-across networks and peer failures. Inventory relay/bootstrap dependencies;
-faculty/participant browser-only service execution and peer replication remain
-required. Hologram's WebRTC path is not evidence about Veilid's capabilities.
-
-## Holospaces threat-model inputs
-
-Reuse the [threat model](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/specs/holospaces/src/arc42/adoc/13_product_security.adoc)
-and its witnesses alongside the [network design](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/specs/refactor/04-networks.md).
-The latter distinguishes restricted access from private encrypted content and
-identifies open public-network abuse economics and durability/replication policy.
-Operator-owned storage and NIC-capable egress peers in the former are not
-automatically valid assumptions for Foundry's browser-session deployment.
-
-At that revision, the Hologram devcontainer passed:
-
-- `bash vv/suites/cc40-product-security.sh`: eight tests, none ignored.
-- `bash vv/suites/cc38-content-net.sh`: four in-process exchange/tampering
-  tests, none ignored; bare-metal and browser-target compatibility builds,
-  not cross-network browser deployment tests.
-
-These witness the tested properties, not large-scale availability, hostile
-storage confidentiality, or resistance to a compromised initial verifier.
-CC-40's public-key identity and roster checks do not demonstrate private-key
-possession, authenticated sessions, or Foundation role admission.
-Foundry must bind inherited claims to their exact evidence and validate
-changed assumptions explicitly.
-
-Additional inspected witnesses, not rerun here, include real loopback
-[TCP/DHT exchanges](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/crates/hologram-net/tests/uor_native_dht.rs)
-and [CC-49 browser WebRTC](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/spaces/holospaces-browser/web/webrtc-content-net-test.mjs).
-CC-49 uses two Chromium contexts, host ICE, and harness-carried signaling;
-it does not establish cross-NAT or geographically distributed operation.
-The [DHT implementation](https://github.com/Hologram-Technologies/hologram/blob/96769f16be454ab1572fddff4613704ccfbebf5e/crates/hologram-net/src/tcp/dht.rs#L82-L104)
-retains incumbent entries without liveness probes. Neither these tests nor
-cache-on-fetch establish churn/eclipsing resistance or durable replica policy.
-Foundry acceptance still requires adversarial churn/partition, browser eviction,
-and last-replica-loss evidence against its modeled recovery obligations.
-
-## Verification of the bootstrap
-
-- On 15 September 2026, GitHub's Pages API confirmed Actions deployment
-  (`build_type: workflow`) and the verified custom domain `app.uor.foundation`.
-  Its health check reported `InvalidDNSError`/`NXDomain`; no HTTPS certificate
-  was available and HTTPS enforcement was false. Deployment remains unaccepted.
-  The DNS owner must configure `app` as a CNAME to `uor-foundation.github.io`,
-  then certificate issuance and HTTPS enforcement must be verified. For Actions
-  deployments, a repository `CNAME` file does not configure DNS; see
-  [GitHub's domain contract](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-a-subdomain).
-- Whitespace checks passed; inherited agent policy, bootstrap workflow, and
-  generated conformance document remain byte-identical to the template.
-- [CI at a006253](https://github.com/UOR-Foundation/foundry-web/actions/runs/34928559731)
-  failed on both architectures because `prismpm.lock` is absent. No gate was
-  disabled and no SDK or application acceptance was claimed.
-- The PrismPM source devcontainer's `cargo xtask package-api` fails to resolve
-  `uor-hologram`. The last real upstream
-  [publication attempt](https://github.com/Hologram-Technologies/hologram/actions/runs/34018837931)
-  failed with a publishing-permission error; later successful dry runs do not
-  demonstrate publication. The upstream owner must establish authorized
-  publication before the SDK dependency closure can be accepted.
+The inherited complete `just vv` gate remains active. Missing SDK locks and
+missing producer acceptance are not bypassed by an empty publisher register.
