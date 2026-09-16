@@ -34,7 +34,10 @@ The reviewed template update separates ephemeral private Buildx state from
 read-only credentials. Full native AMD64 `just vv` passed again with that
 update in the same exact SDK; log SHA-256:
 `0c3de0c13f7aa94a3de608ed972a11f883781193bae585521f82aea4be214e76`.
-Hosted AMD64/ARM64 verification must confirm the corrected workflow itself.
+[Hosted bootstrap 35107315049](https://github.com/UOR-Foundation/foundry-web/actions/runs/35107315049)
+passed the complete scaffold gate on AMD64 and ARM64 at
+`0211c38ea7bb358a86bb9742b23c3521a3ee222e`, including actual Buildx execution.
+This confirms the workflow correction, not product or publication acceptance.
 
 On 16 September 2026, the application model and 19 source/configuration/test
 files moved byte-for-byte to `uor-foundry`, together with the application
