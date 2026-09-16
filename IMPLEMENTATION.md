@@ -16,7 +16,7 @@ and implementation work are owned by
 
 The draft binds development candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
 from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`, using template policy
-`a21a5426c290aeac92df1c0b1c63d9701420ae68`. Independent signature/provenance
+`0f1245367d317d439e6752be277047eef76a9e90`. Independent signature/provenance
 verification and actual never-started image captures match for AMD64 and ARM64.
 The SDK's normal template and lock checks pass; template update reports no
 change. These establish the binding, not producer or production acceptance.
@@ -29,6 +29,12 @@ dependency advisories. Log SHA-256:
 The register contains zero publisher/product capabilities; this pass does not
 establish portal publication. ARM64 CI and every publication requirement above
 remain separate checks. No reduced release gate was introduced.
+
+The reviewed template update separates ephemeral private Buildx state from
+read-only credentials. Full native AMD64 `just vv` passed again with that
+update in the same exact SDK; log SHA-256:
+`0c3de0c13f7aa94a3de608ed972a11f883781193bae585521f82aea4be214e76`.
+Hosted AMD64/ARM64 verification must confirm the corrected workflow itself.
 
 On 16 September 2026, the application model and 19 source/configuration/test
 files moved byte-for-byte to `uor-foundry`, together with the application
