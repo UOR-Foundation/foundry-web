@@ -14,6 +14,13 @@ and implementation work are owned by
 | Actions upload/deploy of unchanged verified assets | Required; no draft-preview deployment substitutes for the product |
 | Independent live identity, byte, role/journey, negative, and rollback checks | Required; final acceptance cannot precede these |
 
+The SDK already supports immutable `pull` and `verify-release` without local
+application source. It lacks a public, verified deployment-artifact exporter;
+its Pages lifecycle path currently rejects execution with `PP7101`. Complete
+the producer-modeled artifact manifest, confined atomic export, readiness and
+target-authorization validation in PrismPM. The publisher must consume that
+contract, not extract arbitrary files or reuse the producer build workflow.
+
 The draft binds development candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
 from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`, using template policy
 `0f1245367d317d439e6752be277047eef76a9e90`. Independent signature/provenance
