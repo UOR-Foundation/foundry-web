@@ -44,9 +44,9 @@ the exact deployed release. This follows the producer's explicit
 producer-ready, deployment-authorized, and accepted states, without inventing
 a first-release exception or claiming deployment evidence before it exists.
 
-Publish verified, authorized bytes without rebuilding or rewriting them. If a target
-requires changed assets or application behavior, the change returns to the
-producer model and its complete acceptance gate. The publisher must not
+Publish verified, authorized bytes without rebuilding or rewriting them.
+If a target requires changed assets or application behavior, the change returns
+to the producer model and its complete acceptance gate. The publisher must not
 weaken or replace the producer's acceptance requirements.
 
 ## Pages bootstrap
@@ -62,21 +62,21 @@ the Pages API listed this repository's default address as
 be confirmed before release. Existing website routing must not be changed
 implicitly. The future `app.uor.foundation` address is not a prerequisite.
 
-Pages distributes the producer's verified, authorized bootstrap closure; it does not
-supply application backends, peer transport, or proof of browser-network
-independence. The complete product's browser-only service, replication,
+Pages distributes the producer's verified, authorized bootstrap closure;
+it does not supply application backends, peer transport, or proof of
+browser-network independence. The complete product's browser-only service, replication,
 recovery, and authorized migration requirements remain in force.
 
 ## Publication acceptance
 
 Use the template's immutable SDK/devcontainer and complete `just vv` boundary.
 Publisher tests must demonstrate rejection of substituted producer/model
-identities, absent or unaccepted evidence, incomplete or changed artifact
-trees, unauthorized targets, unsafe paths, and stale deployment results.
+identities, absent or state-inappropriate evidence, incomplete or changed
+artifact trees, unauthorized targets, unsafe paths, and stale deployment results.
 
-Upload only the verified, authorized artifact closure. Deploy it without a second
-build, under the authorized environment and credentials. Bind the deployment
-result to the exact publisher revision and producer release.
+Upload only the verified, authorized artifact closure. Deploy it without a
+second build, under the authorized environment and credentials. Bind the
+deployment result to the exact publisher revision and producer release.
 
 Verify the actual HTTPS URL, redirect destinations, complete asset bytes,
 and generated application's stakeholder journeys after deployment. URLs must
