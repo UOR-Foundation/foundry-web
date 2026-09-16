@@ -99,6 +99,9 @@ fn update_preserves_project_content(source: &str) -> bool {
             .and_then(|line| line.strip_suffix("; do"))
     }) == Some("AGENTS.md VERIFICATION.md template-contract.json .github/workflows/bootstrap.yml")
         && source.contains("prismpm.lock standards.lock template-contract.json template.lock")
+        && source.contains("test \"$(git -C .template-policy rev-parse HEAD)\" = \"$TEMPLATE_REVISION\"")
+        && source.contains("--volume \"$PWD/.template-policy:/template-policy:ro\"")
+        && source.contains("/template-policy/bootstrap/render.mjs \"$SDK_IMAGE\" \"$ACTION_REFERENCE\" \"$TEMPLATE_REVISION\" /sdk-platforms")
         && !source.contains(".github/workflows/ci.yml")
         && !source.contains(".github/workflows/honesty.yml")
         && !source.contains(".github/actions/prismpm")
@@ -198,10 +201,55 @@ fn audit_policy_files(root: &Path, lock: &serde_json::Value) -> Result<(), Fail>
 fn audit_sdk_inventory(lock: &serde_json::Value) -> Result<(), Fail> {
     let inventory_path = std::env::var_os("PRISMPM_SDK_INVENTORY")
         .ok_or("audit-bootstrap must run inside the digest-selected PrismPM SDK")?;
-    let inventory: serde_json::Value = serde_json::from_slice(&std::fs::read(inventory_path)?)?;
+    let inventory_bytes = std::fs::read(inventory_path)?;
+    let architecture = match std::env::consts::ARCH {
+        "x86_64" => "amd64",
+        "aarch64" => "arm64",
+        value => value,
+    };
+    compare_sdk_inventory(
+        lock,
+        &inventory_bytes,
+        &format!("{}/{architecture}", std::env::consts::OS),
+    )
+}
+
+fn compare_sdk_inventory(
+    lock: &serde_json::Value,
+    inventory_bytes: &[u8],
+    platform: &str,
+) -> Result<(), Fail> {
+    let inventory: serde_json::Value = serde_json::from_slice(inventory_bytes)?;
     let artifacts = inventory["artifacts"]
         .as_array()
         .ok_or("running SDK has no artifact inventory")?;
+    if lock["schema"] == "prismpm/sdk-lock/2" {
+        let platforms = lock["platforms"]
+            .as_array()
+            .ok_or("SDK platform inventory is absent")?;
+        let matching = platforms
+            .iter()
+            .filter(|row| row["platform"] == platform)
+            .collect::<Vec<_>>();
+        if matching.len() != 1 || platforms.len() != 2 {
+            return Err("SDK platform inventory is missing or duplicated".into());
+        }
+        let selected = matching[0];
+        if selected["inventory"] != inventory["artifacts"]
+            || selected["inventory_digest"] != sha256(inventory_bytes)
+        {
+            return Err(
+                "prismpm.lock native artifact inventory disagrees with the running SDK".into(),
+            );
+        }
+        // The complete template-check also invokes the SDK's closed /2
+        // validator for the index and child bindings. This independent gate
+        // compares the actual executing native inventory without a fallback.
+        return Ok(());
+    }
+    if lock["schema"] != "prismpm/sdk-lock/1" {
+        return Err("unsupported SDK lock schema".into());
+    }
     let locked = lock["inventory"]
         .as_array()
         .ok_or("prismpm.lock has no SDK inventory")?;
@@ -466,11 +514,57 @@ pub fn audit(root: &Path) -> Result<(), Fail> {
 #[cfg(test)]
 mod tests {
     use super::{
-        action_reference_is_pinned, content_matches, docker_credentials_are_confined,
-        immutable_image, pipeline_lifecycle_is_complete, policy_boundary_is_canonical, sha256,
-        update_preserves_project_content, workflow_history_is_complete, PROJECT_CONTENT_PATHS,
-        UNIVERSAL_POLICY_PATHS,
+        PROJECT_CONTENT_PATHS, UNIVERSAL_POLICY_PATHS, action_reference_is_pinned, content_matches,
+        docker_credentials_are_confined, immutable_image, pipeline_lifecycle_is_complete,
+        policy_boundary_is_canonical, sha256, update_preserves_project_content,
+        workflow_history_is_complete,
     };
+
+    #[test]
+    fn initial_standards_binding_refuses_project_drift() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap();
+        let result = std::process::Command::new("node")
+            .args(["--test", "bootstrap/standards-lock.test.mjs"])
+            .current_dir(root)
+            .status()
+            .expect("the locked SDK supplies Node");
+        assert!(result.success(), "standards binding negative tests failed");
+    }
+
+    #[test]
+    fn native_platform_inventory_rejects_swaps_missing_platforms_and_legacy_drift() {
+        let bytes = |architecture: &str| {
+            serde_json::to_vec(&serde_json::json!({"artifacts":[{
+            "id":"native-tool", "digest":sha256(architecture.as_bytes()), "kind":"binary", "version":"test"
+        }]})).unwrap()
+        };
+        let amd64 = bytes("amd64");
+        let arm64 = bytes("arm64");
+        let row = |platform: &str, bytes: &[u8]| {
+            serde_json::json!({"platform":platform,
+            "inventory_digest":sha256(bytes), "inventory":serde_json::from_slice::<serde_json::Value>(bytes).unwrap()["artifacts"]})
+        };
+        let lock = serde_json::json!({"schema":"prismpm/sdk-lock/2", "platforms":[
+            row("linux/amd64", &amd64), row("linux/arm64", &arm64)]});
+        for (platform, actual, other) in [
+            ("linux/amd64", &amd64, &arm64),
+            ("linux/arm64", &arm64, &amd64),
+        ] {
+            super::compare_sdk_inventory(&lock, actual, platform).unwrap();
+            assert!(super::compare_sdk_inventory(&lock, other, platform).is_err());
+        }
+        let mut missing = lock.clone();
+        missing["platforms"].as_array_mut().unwrap().pop();
+        assert!(super::compare_sdk_inventory(&missing, &amd64, "linux/amd64").is_err());
+        let legacy = serde_json::json!({"schema":"prismpm/sdk-lock/1",
+            "sdk_image":format!("example.invalid/sdk@{}",sha256(b"test")),
+            "inventory":[lock["platforms"][0]["inventory"][0],
+                {"id":"sdk-manifest", "digest":sha256(b"test"), "kind":"image", "version":"test"}]});
+        super::compare_sdk_inventory(&legacy, &amd64, "linux/amd64").unwrap();
+        assert!(super::compare_sdk_inventory(&legacy, &arm64, "linux/arm64").is_err());
+    }
 
     #[test]
     fn floating_action_plant_is_rejected() {
@@ -510,6 +604,14 @@ mod tests {
         assert!(!update_preserves_project_content(
             &workflow.replace("prismpm.lock standards.lock", "prismpm.lock")
         ));
+        assert!(!update_preserves_project_content(&workflow.replace(
+            "/template-policy/bootstrap/render.mjs",
+            "bootstrap/render.mjs"
+        )));
+        assert!(!update_preserves_project_content(&workflow.replace(
+            "$PWD/.template-policy:/template-policy:ro",
+            "$PWD/.template-policy:/template-policy"
+        )));
         assert!(!update_preserves_project_content(&format!(
             "{workflow}\n          rm -f .github/workflows/honesty.yml\n"
         )));
