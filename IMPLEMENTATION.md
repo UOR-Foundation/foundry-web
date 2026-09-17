@@ -60,3 +60,24 @@ was changed; `app.uor.foundation` is not required for bootstrap.
 
 The inherited complete `just vv` gate remains active. Missing SDK locks and
 missing producer acceptance are not bypassed by an empty publisher register.
+
+## Main-branch repair
+
+SDK binding and dependency repairs are integrated on `main`.
+[Bootstrap 35177709316](https://github.com/UOR-Foundation/foundry-web/actions/runs/35177709316)
+passed the complete scaffold gate on AMD64 and ARM64 at
+`92d34236bbfa7d230dc35a179950859f61dec1f4`. PRs #1 and #3 are merged.
+
+Project-owned dependency maintenance adopts the reviewed guard from template
+`1bea460bac6ea50bae53a7eeb674589d7900e6cb`. Only the SDK action and byte-bound
+bootstrap workflow use the SDK/template update flow; ordinary weekly Actions
+and Cargo updates remain enabled. Universal policy and SDK lock bytes are
+unchanged. Full native AMD64 `just vv`, including 22 Rust tests and two Node
+tests without skips, passed in the locked SDK; its log is
+`target/maintenance-full-vv.log`. The owning guard's negative tests reject
+broader or missing exclusions and disabled maintenance.
+
+On 17 September 2026 UTC, the Pages API still reported no deployments and
+the default HTTPS URL returned 404. No accepted producer release or Pages
+publication workflow exists. These main-branch repairs do not constitute
+portal deployment or product acceptance.
