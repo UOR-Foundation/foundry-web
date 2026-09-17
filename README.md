@@ -22,10 +22,12 @@ No full producer release or production deployment is accepted yet.
 The publication contract is in [SPEC.md](SPEC.md); remaining work is tracked in
 [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
-The draft SDK/template binding selects an authenticated development candidate.
-It is not a production-accepted SDK and must not be merged or used for release.
-The complete `just vv` gate remains required; source checkouts and host tools
-are not substitutes for the locked SDK.
+The SDK/template binding selects an authenticated development candidate.
+Reviewed development infrastructure belongs on `main` after the complete
+repository gate passes. Main-branch integration does not qualify the SDK or
+portal for production release; publication retains its separate acceptance
+requirements. Source checkouts and host tools are not substitutes for the
+locked SDK.
 
 Application source and acceptance belong in `uor-foundry`, including the
 unaccepted draft-preview increment moved out of this repository.

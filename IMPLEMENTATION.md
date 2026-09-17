@@ -7,7 +7,7 @@ and implementation work are owned by
 
 | Required work | Status |
 | --- | --- |
-| Accepted immutable SDK and template binding | Blocked: production dependency closure cannot resolve `uor-hologram`; draft PR #3 is not acceptance |
+| Accepted immutable SDK and template binding | Blocked: production dependency closure cannot resolve `uor-hologram`; development integration is not production acceptance |
 | Complete producer model, services, controls, and pre-publication evidence | Required in uor-foundry; no producer-ready full portal release exists |
 | SDK acquisition and verification of the exact producer release/artifact closure | Required; existing OCI transport is not evidence of complete publisher integration |
 | Approved target and authorized deployment decision | Required; requested domain routing is not configured |
@@ -21,7 +21,7 @@ the producer-modeled artifact manifest, confined atomic export, readiness and
 target-authorization validation in PrismPM. The publisher must consume that
 contract, not extract arbitrary files or reuse the producer build workflow.
 
-The draft binds development candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
+The development binding selects candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
 from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`, using template policy
 `0f1245367d317d439e6752be277047eef76a9e90`. Independent signature/provenance
 verification and actual never-started image captures match for AMD64 and ARM64.
