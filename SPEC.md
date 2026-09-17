@@ -4,6 +4,20 @@ The complete product contract belongs to
 [uor-foundry](https://github.com/UOR-Foundation/uor-foundry/blob/main/SPEC.md).
 This repository publishes that product; it is not a second Foundation model.
 
+## Authorized initial scope
+
+The owner authorizes a first functional release of identity, roles, shared
+workspaces, persistence, and messaging. All five must be implemented and pass
+their complete producer and deployment gates; a mock or draft preview is not
+an eligible release. All other Foundation facets remain required and explicitly
+unaccepted. Publishing the core does not establish full Foundation implementation
+or standards compliance.
+
+The producer defines workspace identity and permissions. Authentication or a
+workspace role must not be presented as verified Foundation faculty status,
+appointment, or organizational authority without approved supporting records.
+The publisher preserves this distinction and the exact declared stage.
+
 ## Ownership
 
 `uor-foundry` owns organizational and site definitions, controls, services,
@@ -26,21 +40,25 @@ branch, tag, arbitrary build directory, or unchecked workflow artifact.
 The release and verification evidence bind:
 
 - producer repository and exact source revision;
-- authoritative model identity and complete service/dependency closure;
+- authorized stage, authoritative model identity and complete stage
+  service/dependency closure;
 - controls, inherited obligations, assessments, and release-state evidence;
 - locked SDK, compiler, runtime, and oracle identities; and
 - exact generated portal artifact tree and approved deployment configuration.
 
 Verify artifact integrity, producer identity, authorization, evidence validity,
 and acceptance independently. A signed SDK, valid digest, signature count,
-or passing schema cannot establish full Foundry acceptance. Reject partial
-or draft-preview releases, missing evidence, and mismatched model or artifacts.
+or passing schema cannot establish core or full Foundry acceptance. Reject
+incomplete stage capabilities, draft-preview releases, missing evidence,
+scope substitutions, and mismatched model or artifacts.
 
-The producer must pass all pre-publication product gates before a separately
-authorized deployment. Record the exact live checks that can run only after
-deployment; no other unfinished work may enter that state. Final acceptance
-requires all those checks and remaining operational assessments to pass for
-the exact deployed release. This follows the producer's explicit
+The producer must pass all pre-publication gates for the entire authorized
+stage before a separately authorized deployment. Record the exact live checks
+that can run only after deployment; no other unfinished work within that stage
+may enter that state. Final acceptance requires all those checks and applicable
+operational assessments to pass for
+the exact deployed stage. Other Foundation facets remain explicitly unaccepted,
+not implicitly satisfied or waived. This follows the producer's explicit
 producer-ready, deployment-authorized, and accepted states, without inventing
 a first-release exception or claiming deployment evidence before it exists.
 
@@ -52,15 +70,16 @@ weaken or replace the producer's acceptance requirements.
 ## Pages bootstrap
 
 GitHub Actions publishes the verified portal under `/foundry-web/`.
-Assets, links, navigation, browser storage, and complete stakeholder journeys
-must work at that subpath without an `app.uor.foundation` dependency.
+Assets, links, navigation, browser storage, and complete stage stakeholder
+journeys must work at that subpath without an `app.uor.foundation` dependency.
 
 The owner requested `https://uor.foundation/foundry-web/`. On 16 September
 2026, GitHub associated `uor.foundation` with the separate `website` project;
 the Pages API listed this repository's default address as
-`https://uor-foundation.github.io/foundry-web/`. The deployment address must
-be confirmed before release. Existing website routing must not be changed
-implicitly. The future `app.uor.foundation` address is not a prerequisite.
+`https://uor-foundation.github.io/foundry-web/`. The default address is allowed
+for the initial release; authorization binds its exact origin and subpath.
+Existing website routing must not be changed implicitly. The future
+`app.uor.foundation` address is not a prerequisite.
 
 Pages distributes the producer's verified, authorized bootstrap closure;
 it does not supply application backends, peer transport, or proof of
@@ -79,7 +98,8 @@ second build, under the authorized environment and credentials. Bind the
 deployment result to the exact publisher revision and producer release.
 
 Verify the actual HTTPS URL, redirect destinations, complete asset bytes,
-and generated application's stakeholder journeys after deployment. URLs must
+and all five core capabilities' independent-user journeys after deployment,
+including role enforcement, persistent state and message exchange. URLs must
 remain within approved origins and paths; a successful deployment API response
 or HTTP 200 alone does not establish correctness. Failed live verification
 does not become accepted by updating expected bytes or omitting failed tests.

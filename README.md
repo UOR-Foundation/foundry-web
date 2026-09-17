@@ -19,6 +19,10 @@ The future `app.uor.foundation` address is not required for this deployment.
 Created from
 [UOR template](https://github.com/UOR-Foundation/template/tree/e0e11ecb1b38e202116d9806887363848629d439).
 No full producer release or production deployment is accepted yet.
+The authorized first functional release contains identity, roles, shared
+workspaces, persistence, and messaging, not a draft preview. It is not yet
+implemented or accepted. Other Foundation facets remain required and unaccepted;
+workspace roles do not establish verified Foundation authority.
 The publication contract is in [SPEC.md](SPEC.md); remaining work is tracked in
 [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
