@@ -10,16 +10,29 @@ and implementation work are owned by
 | Accepted immutable SDK and template binding | Blocked: production dependency closure cannot resolve `uor-hologram`; development integration is not production acceptance |
 | Complete producer model, services, controls, and pre-publication evidence | Required in uor-foundry; no producer-ready full portal release exists |
 | SDK acquisition and verification of the exact producer release/artifact closure | Required; existing OCI transport is not evidence of complete publisher integration |
-| Approved target and authorized deployment decision | Required; requested domain routing is not configured |
+| Approved target and authorized deployment decision | Required for the producer release; the default Pages URL is allowed for bootstrap |
 | Actions upload/deploy of unchanged verified assets | Required; no draft-preview deployment substitutes for the product |
 | Independent live identity, byte, role/journey, negative, and rollback checks | Required; final acceptance cannot precede these |
 
 The SDK already supports immutable `pull` and `verify-release` without local
-application source. It lacks a public, verified deployment-artifact exporter;
-its Pages lifecycle path currently rejects execution with `PP7101`. Complete
-the producer-modeled artifact manifest, confined atomic export, readiness and
-target-authorization validation in PrismPM. The publisher must consume that
-contract, not extract arbitrary files or reuse the producer build workflow.
+application source. PrismPM source now provides `export-browser` for the six
+verified browser files of supported application profiles, but the locked SDK
+does not contain that API. Integrate it through a reviewed immutable SDK update,
+not a source checkout. Export verifies integrity only; complete producer-modeled
+artifact coverage, readiness, target authorization, live acceptance and rollback
+remain required. The Pages lifecycle path still rejects execution with `PP7101`.
+The publisher must consume the SDK contract, not extract arbitrary files or
+reuse the producer build workflow.
+
+The unresolved `uor-hologram` dependency belongs to the current PrismPM
+archive/codec implementation. It does not establish a requirement to host the
+Hologram platform; any separation must preserve `.holo` compatibility and its
+authoritative validation. It does not account for the independently missing
+producer services or publication implementation.
+
+Full native AMD64 `just vv` for this status update passed in the locked SDK;
+log: `target/source-export-status-full-vv.log`. This is scaffold verification,
+not publication acceptance.
 
 The development binding selects candidate index `sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`
 from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`, using template policy
@@ -55,7 +68,8 @@ GitHub's Pages API reports Actions deployment and no repository custom domain.
 Its default URL is `https://uor-foundation.github.io/foundry-web/`.
 `uor.foundation` is attached to the separate `website` project, so the requested
 `https://uor.foundation/foundry-web/` needs an explicit routing decision.
-Both Foundry URLs currently return HTTP 404. No existing website configuration
+Both Foundry URLs returned HTTP 404 on 17 September 2026 UTC. Custom routing
+does not block bootstrap at the default URL. No existing website configuration
 was changed; `app.uor.foundation` is not required for bootstrap.
 
 The inherited complete `just vv` gate remains active. Missing SDK locks and
