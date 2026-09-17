@@ -13,7 +13,7 @@ must not claim otherwise.
 
 | Required work | Status |
 | --- | --- |
-| Accepted immutable SDK and template binding | Blocked: production dependency closure cannot resolve `uor-hologram`; development integration is not production acceptance |
+| Accepted immutable SDK and template binding | Required: verify the self-contained OCI SDK with the modeled Holo/1 codec, then update the exact SDK/template binding; development integration is not acceptance |
 | Complete core model, five services, applicable controls, and pre-publication evidence | Required in uor-foundry; no producer-ready functional core exists |
 | SDK acquisition and verification of the exact producer release/artifact closure | Required; existing OCI transport is not evidence of complete publisher integration |
 | Approved target and authorized deployment decision | Required for the producer release; the default Pages URL is allowed for bootstrap |
@@ -31,11 +31,12 @@ remain required. The Pages lifecycle path still rejects execution with `PP7101`.
 The publisher must consume the SDK contract, not extract arbitrary files or
 reuse the producer build workflow.
 
-The unresolved `uor-hologram` dependency belongs to the current PrismPM
-archive/codec implementation. It does not establish a requirement to host the
-Hologram platform; any separation must preserve `.holo` compatibility and its
-authoritative validation. It does not account for the independently missing
-producer services or publication implementation.
+PrismPM source replaces its production Hologram dependency with the
+LexLean-generated `prism-stdlib` Holo/1 codec and retains isolated upstream
+compatibility oracles. The current SDK lock has not changed. The owner requires
+Foundry publication and verification before first-party crates.io publication;
+the verified OCI SDK must carry its complete offline dependency closure.
+Package, oracle, producer and publication acceptance remain required.
 
 The preceding source-export status update passed full native AMD64 `just vv`
 in the locked SDK; log: `target/source-export-status-full-vv.log`.
