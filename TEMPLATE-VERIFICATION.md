@@ -30,3 +30,22 @@ added without the other two.
 `audit-deferral` reads every crate and `xtask`, including itself. Its token
 construction therefore cannot exempt the very gate in which a deferral could
 otherwise be hidden.
+
+## Initial SDK policy binding preparation
+
+This source-only proposal imports the seven reviewed bootstrap, renderer,
+contract and native-audit files byte-for-byte from
+`UOR-Foundation/template@a21a5426c290aeac92df1c0b1c63d9701420ae68`.
+It is based on Foundry main
+`2530e40be1c831f5288295b1b0b4376818f7ca54`, independently of application work.
+No application capability, SDK lock or standards selection is introduced.
+
+Component checks ran offline as UID 1000 in the existing local SDK image ID
+`sha256:a6ca6a0ef68697755ee7aa109e4d240dba6b386b9290639ebd48340aea59578f`:
+all 11 `xtask` tests (including absent/matching/different standards-lock cases),
+all-target Clippy at `-D warnings`, shell/Node syntax, and `check-model` passed.
+The model remains the empty scaffold with zero claimed application IDs.
+These checks are not a published SDK identity or this repository's full
+`just vv` acceptance. Before merge, render the real candidate image inventory
+and locks on this branch using the exact template revision above, run the
+complete scaffold `just vv` inside that selected image, and require its CI.
