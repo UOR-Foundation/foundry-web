@@ -1,13 +1,12 @@
 # Foundry Web
 
 The publication repository for the
-[UOR Foundry](https://github.com/UOR-Foundation/uor-foundry) PrismPM portal.
+[Foundry](https://github.com/UOR-Foundation/uor-foundry) organizational platform.
 `uor-foundry` owns the complete model, services, workflows, and stakeholder
 Views; this repository publishes its verified, authorized output without
-duplicating application logic. The UOR Foundation is dedicated to the
-democratization of technology for the well-being of humanity and operates
-under the Citizen Gardens model through a network of Foundries. The first
-Foundry is also the Foundation's headquarters.
+duplicating application logic. Organizations, including the UOR Foundation,
+are created through normal modeled workflows. No organization, account, or
+UOR-specific authority is preseeded.
 
 The initial Pages deployment will use GitHub Actions under `/foundry-web/`.
 The default address is `https://uor-foundation.github.io/foundry-web/`;
@@ -21,8 +20,9 @@ Created from
 No full producer release or production deployment is accepted yet.
 The authorized first functional release contains identity, roles, shared
 workspaces, persistence, and messaging, not a draft preview. It is not yet
-implemented or accepted. Other Foundation facets remain required and unaccepted;
-workspace roles do not establish verified Foundation authority.
+implemented or accepted. All other producer-defined services and controls
+remain required and unaccepted; application roles do not establish legal
+identity or organizational appointment.
 The publication contract is in [SPEC.md](SPEC.md); remaining work is tracked in
 [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
