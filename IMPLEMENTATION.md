@@ -31,8 +31,9 @@ references. On 18 September 2026, `export-browser --help` in that exact image
 failed with an unrecognized subcommand.
 
 PrismPM source provides integrity-only `export-browser` for the six generated
-browser files of supported application profiles. The shared Action does not
-expose that command; the Pages lifecycle path rejects execution with `PP7101`.
+browser files of supported application profiles. The shared Action exposes it
+from `0c85c1f465c1b2b38f149d461992694faadacbfe`; this repository's older pinned
+Action and SDK do not. The Pages lifecycle path rejects execution with `PP7101`.
 Adopt reviewed SDK interfaces and verify complete producer artifact coverage,
 readiness, target authorization, and live acceptance before publication.
 Neither arbitrary OCI extraction nor reuse of the producer build workflow
