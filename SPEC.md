@@ -18,6 +18,12 @@ Foundry supports organizations created through its normal modeled workflows.
 Initial product state contains no seeded organization, account, membership,
 or UOR-specific authority. The UOR Foundation can be created through the same
 flows as any other organization; its name or domain confers no privilege.
+Anyone may enroll and create an organization without Foundation or name-owner
+approval. Duplicate display names are allowed; distinct UOR-referenced
+organization identities govern isolation and authority. Verified email
+enrollment, login and recovery are required producer capabilities implemented
+through PrismPM and the UOR Framework-native approach, not publisher-added
+authentication logic or a requirement to select a hosted authentication vendor.
 
 The producer defines identity, organization isolation, scoped ownership,
 permissions, and recovery. Authentication or an application role does not
@@ -108,7 +114,8 @@ deployment result to the exact publisher revision and producer release.
 Verify the actual HTTPS URL, redirect destinations, complete asset bytes,
 and all five core capabilities' independent-user journeys after deployment,
 including normal account and organization creation from empty product state,
-multi-organization isolation, scoped ownership and role enforcement,
+duplicate-name organization isolation, verified email enrollment, scoped
+ownership and role enforcement,
 configured authorization quorums, account and ownership recovery, persistent
 state, and message exchange. Demonstrate rejection of cross-organization and
 unauthorized access with independent users and browser profiles. Neither a

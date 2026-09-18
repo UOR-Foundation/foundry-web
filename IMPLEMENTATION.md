@@ -8,8 +8,10 @@ The authorized initial release requires identity, roles, shared workspaces,
 persistence, and messaging. It must support normal account and organization
 creation, multi-organization isolation, scoped ownership, and recovery without
 a seeded organization, account, or UOR-specific authority. UOR Foundation is
-created normally. All other producer-defined services and controls remain
-required and explicitly unaccepted.
+created normally; anyone may enroll and create organizations with arbitrary,
+non-unique display names. Producer-owned UOR-native email enrollment/login/recovery
+must be implemented and verified through PrismPM. All other producer-defined
+services and controls remain required and explicitly unaccepted.
 
 | Required work | Status |
 | --- | --- |
