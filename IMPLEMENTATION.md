@@ -10,7 +10,10 @@ creation, multi-organization isolation, scoped ownership, and recovery without
 a seeded organization, account, or UOR-specific authority. UOR Foundation is
 created normally; anyone may enroll and create organizations with arbitrary,
 non-unique display names. Producer-owned UOR-native email enrollment/login/recovery
-must be implemented and verified through PrismPM. All other producer-defined
+and saved-backup-code recovery must be implemented and verified through PrismPM,
+including replay/rollback rejection and preservation of scoped authority.
+Existing mail infrastructure does not own Foundry account-management logic.
+All other producer-defined
 services and controls remain required and explicitly unaccepted.
 
 | Required work | Status |

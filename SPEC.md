@@ -24,6 +24,10 @@ organization identities govern isolation and authority. Verified email
 enrollment, login and recovery are required producer capabilities implemented
 through PrismPM and the UOR Framework-native approach, not publisher-added
 authentication logic or a requirement to select a hosted authentication vendor.
+Producer-defined recovery also includes saved backup codes, with one-time
+consumption, credential replacement and authority-continuity enforcement.
+Existing mail infrastructure is a modeled communication boundary, not the
+owner of Foundry accounts or organization permissions.
 
 The producer defines identity, organization isolation, scoped ownership,
 permissions, and recovery. Authentication or an application role does not
@@ -117,7 +121,11 @@ including normal account and organization creation from empty product state,
 duplicate-name organization isolation, verified email enrollment, scoped
 ownership and role enforcement,
 configured authorization quorums, account and ownership recovery, persistent
-state, and message exchange. Demonstrate rejection of cross-organization and
+state, and message exchange. Reject replayed, revoked or concurrently redeemed
+recovery codes, including stale
+replicas and interrupted recovery. Verify credential/session invalidation and
+notifications without claiming that credential recovery restores lost content.
+Demonstrate rejection of cross-organization and
 unauthorized access with independent users and browser profiles. Neither a
 seeded organization nor a privileged test account may substitute for these
 journeys. URLs must remain within approved origins and paths; a successful
