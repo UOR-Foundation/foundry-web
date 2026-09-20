@@ -44,6 +44,13 @@ readiness, target authorization, and live acceptance before publication.
 Neither arbitrary OCI extraction nor reuse of the producer build workflow
 satisfies the publisher contract.
 
+[SDK integration PR 2](https://github.com/UOR-Foundation/PrismPM/pull/2)
+adds source-free HTTPS artifact-byte verification. Its scope excludes producer
+readiness, target authorization and service acceptance; it is not in this
+repository's locked SDK. Foundry also requires a public effectful application
+and browser-system profile. Internal browser primitives and typed transitions
+do not enable effects in the existing capability-free application profiles.
+
 Foundry publication and verification precede first-party crates.io publication.
 The accepted OCI SDK must therefore carry its complete offline dependency
 closure, including the modeled Holo/1 implementation and validation oracles.
@@ -67,6 +74,12 @@ Both `https://uor-foundation.github.io/foundry-web/` and
 attached to the separate `website` project; existing routing must not be
 changed implicitly. The default Pages URL is sufficient for bootstrap and
 `app.uor.foundation` is not a prerequisite.
+
+On 20 September 2026, the Pages API still reported zero deployments and
+`https_enforced: false`. Enabling HTTPS through the Pages API failed with
+`404: The certificate does not exist yet`; no setting changed. Require HTTPS
+and verify the actual target after GitHub provisions its certificate. This
+does not authorize a preview or change the five-service publication gate.
 
 The inherited complete `just vv` gate remains required. No empty register,
 development SDK, draft preview, or green scaffold substitutes for producer
