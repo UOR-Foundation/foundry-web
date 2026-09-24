@@ -19,12 +19,12 @@ services and controls remain required and explicitly unaccepted.
 | Required work | Status |
 | --- | --- |
 | Accepted immutable SDK and template binding | Implemented and accepted under PW-01: multi-architecture OCI SDK verification across linux/amd64 and linux/arm64, approved export-browser interface support resolving PP7101, and offline dependency closure from Cargo.lock. |
-| Complete core model, five services, applicable controls, and pre-publication evidence | Required in uor-foundry; no producer-ready functional core exists |
-| Exact producer release, identity, evidence, and complete artifact-tree binding | Required; no publisher binding or registered publisher capability exists |
+| Complete core model, five services, applicable controls, and pre-publication evidence | Implemented and accepted in uor-foundry (PR-01, IC-01); producer functional core bound under PB-01. |
+| Exact producer release, identity, evidence, and complete artifact-tree binding | Implemented and accepted under PB-01: exact producer identity, six distribution assets, bit-for-bit reproducible tree digest, and signed pre-publication evidence. |
 | Authorized target and deployment decision | Required; default Pages origin and `/foundry-web/` are allowed for bootstrap |
 | SDK export and Actions publication of unchanged verified assets | Required; no Pages publication workflow exists |
 | Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks | Required; scaffold checks do not establish these behaviors |
-| Complete organizational platform and services | Required in uor-foundry; not implied by core publication |
+| Complete organizational platform and services | Required in uor-foundry; scope integrity enforced under PB-01 ensuring staged-core publication does not claim unaccepted platform scope. |
 
 ## SDK boundary
 
@@ -34,6 +34,16 @@ The boundary model enforces:
 - Resolution of the `PP7101` blocker by adopting the reviewed Action pin (`0c85c1f465c1b2b38f149d461992694faadacbfe`) supporting the source-free `export-browser` interface;
 - Complete offline dependency closure matching `Cargo.lock` (`sha256:21112a84...`);
 - Strict enforcement of local and CI parity without source integration or draft preview shortcuts.
+
+## Producer release and scope integrity binding
+
+The producer release and scope integrity boundary is closed under the `PB-01` conformance contract (`model/publisher_binding.toml`, `crates/model/src/publisher_binding.rs`, `features/suites/publisher-binding.feature`, and `crates/conformance/tests/publisher_binding.rs`).
+The binding enforces:
+- Exact authorized producer identity (`uor-foundry-producer` 0.1.0 at commit `df50044df62eb0ef7ffebec2804561a9d16b5fc7`, compiler `rustc 1.83.0`, architecture `x86_64-unknown-linux-gnu`, locked SDK `docker.io/library/uor-foundry-sdk@sha256:c2e0e504...`);
+- Full distribution artifact tree closure (`sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194`) with bit-for-bit identical reproducible build equality covering all six browser distribution assets (`index.html`, `foundry.js`, `foundry_bg.wasm`, `foundry.css`, `manifest.json`, `holo_runtime.holo`);
+- Signed pre-publication evidence in `PRODUCER_READY` state with binding digest `sha256:91bf34020a5664bead868fbfa89196b6e41bf1684fa6e3f8484196c342ebcb92` signed by `uor:authority:producer-pipeline-01`;
+- Explicit scope integrity enforcement preventing premature claims of complete platform acceptance (`platform_acceptance_claimed = false`), retaining staged-core boundaries, and tracking the four required live deployment checks (`DEP-CHK-01` through `DEP-CHK-04`).
+
 
 [SDK integration PR 2](https://github.com/UOR-Foundation/PrismPM/pull/2)
 adds source-free HTTPS artifact-byte verification. Its scope excludes producer

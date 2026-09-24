@@ -18,6 +18,12 @@ The three honesty levels (R2):
 `cargo xtask audit-limits` fails if any code path returns an error the
 model does not sanction.
 
+## publisher-binding
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `PB-01` | `build` | The publisher binding establishes immutable verification of the exact authorized uor-foundry producer release identity, pre-publication evidence, and bit-for-bit reproducible artifact tree closure, while enforcing explicit dependency on complete producer platform acceptance without conflating staged core publication with full platform scope. |
+
 ## publisher-sdk
 
 | ID | Level | Statement |
