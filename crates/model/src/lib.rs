@@ -12,15 +12,30 @@
 #![deny(missing_docs)]
 
 pub mod codegen;
+pub mod deployment_closure;
 pub mod deployment_policy;
+pub mod live_acceptance;
+pub mod pages_state;
 pub mod publication_pipeline;
 pub mod publisher_binding;
 pub mod publisher_sdk;
 pub mod registry;
 
+pub use deployment_closure::{
+    ClosureEvidenceRecord, DeploymentClosureConfig, DeploymentClosureEngine,
+    DeploymentClosureError, DeploymentClosurePolicyConfig, MatrixRowRecord,
+};
 pub use deployment_policy::{
     AuthorizationConfig, DeploymentDecisionConfig, DeploymentPolicyConfig, DeploymentPolicyEngine,
     DeploymentPolicyError, DeploymentPolicyPolicyConfig, TargetConfig,
+};
+pub use live_acceptance::{
+    LiveAcceptanceConfig, LiveAcceptanceEngine, LiveAcceptanceError, LiveAcceptancePolicyConfig,
+    LiveCheckRecord, LiveTargetConfig, RollbackConfig,
+};
+pub use pages_state::{
+    ArtifactVerificationConfig, DeploymentTargetConfig, HttpsEnforcementConfig, PagesStateConfig,
+    PagesStateEngine, PagesStateError, PagesStatePolicyConfig,
 };
 pub use publication_pipeline::{
     PipelineAssetRecord, PipelineWorkflowConfig, PublicationPipelineConfig,
@@ -56,6 +71,12 @@ pub struct Model {
     pub deployment_policy: DeploymentPolicyConfig,
     /// `model/publication_pipeline.toml`: Source-free export-browser and Actions publication specification.
     pub publication_pipeline: PublicationPipelineConfig,
+    /// `model/pages_state.toml`: GitHub Pages deployment state and HTTPS enforcement.
+    pub pages_state: PagesStateConfig,
+    /// `model/live_acceptance.toml`: Independent live acceptance verification and core journeys.
+    pub live_acceptance: LiveAcceptanceConfig,
+    /// `model/deployment_closure.toml`: Final publication and deployment closure matrix.
+    pub deployment_closure: DeploymentClosureConfig,
 }
 
 /// A failure to load or to cross-check the model.
@@ -92,6 +113,9 @@ impl Model {
             publisher_binding: read(dir, "publisher_binding.toml")?,
             deployment_policy: read(dir, "deployment_policy.toml")?,
             publication_pipeline: read(dir, "publication_pipeline.toml")?,
+            pages_state: read(dir, "pages_state.toml")?,
+            live_acceptance: read(dir, "live_acceptance.toml")?,
+            deployment_closure: read(dir, "deployment_closure.toml")?,
         })
     }
 
@@ -104,7 +128,8 @@ impl Model {
     /// Cross-check the model against itself: every ID well formed, every claim
     /// well formed for its level, every `some-true` claim bound to an
     /// authority that exists (`CM-01` .. `CM-03`, R2), publisher SDK valid,
-    /// publisher binding valid, deployment policy valid, and publication pipeline valid.
+    /// publisher binding valid, deployment policy valid, publication pipeline valid,
+    /// pages state valid, live acceptance valid, and deployment closure valid.
     pub fn check(&self) -> Result<(), ModelError> {
         self.ledger.check()?;
         self.check_ids()?;
@@ -113,6 +138,9 @@ impl Model {
         self.publisher_binding.check()?;
         self.deployment_policy.check()?;
         self.publication_pipeline.check()?;
+        self.pages_state.check()?;
+        self.live_acceptance.check()?;
+        self.deployment_closure.check()?;
         Ok(())
     }
 

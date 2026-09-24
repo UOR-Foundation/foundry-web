@@ -23,8 +23,9 @@ services and controls remain required and explicitly unaccepted.
 | Exact producer release, identity, evidence, and complete artifact-tree binding | Implemented and accepted under PB-01: exact producer identity, six distribution assets, bit-for-bit reproducible tree digest, and signed pre-publication evidence. |
 | Authorized target and deployment decision | Implemented and accepted under DP-01: target origin/path authorization (https://uor-foundation.github.io/foundry-web/), prohibition of implicit routing changes, protected-ref ruleset prerequisites on main, and deterministic denial of unauthorized contexts. |
 | SDK export and Actions publication of unchanged verified assets | Implemented and accepted under PP-01: source-free export of six-file browser closure, pre-upload artifact digest and tree integrity verification, and publication workflow (.github/workflows/pages.yml) deploying unchanged assets to GitHub Pages. |
-| Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks | Required; scaffold checks do not establish these behaviors |
-| Complete organizational platform and services | Required in uor-foundry; scope integrity enforced under PB-01 ensuring staged-core publication does not claim unaccepted platform scope. |
+| Pages deployment, artifacts, and HTTPS enforcement | Implemented and accepted under PS-01: non-zero Pages deployments, Actions artifacts for accepted release, HTTPS enforcement on target, and exact publisher/producer release binding. |
+| Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks | Implemented and accepted under LA-01: byte-for-byte asset matching for all six browser closure assets, full execution of core stakeholder journeys (creation, isolation, ownership, recovery, messaging), and verified rollback triggers. |
+| Complete organizational platform and services | Required in uor-foundry; scope integrity enforced under PB-01 and deployment closure verified under DC-01 ensuring staged-core publication does not claim unaccepted platform scope. |
 
 ## SDK boundary
 
@@ -63,6 +64,34 @@ The pipeline enforces:
 - Pre-upload byte and tree digest verification matching `sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194`;
 - Dedicated GitHub Actions publication workflow (`.github/workflows/pages.yml`) deploying unchanged verified assets to the `github-pages` environment on `main`;
 - Pinned, immutable action dependencies (`actions/checkout@11bd7190...`, `actions/upload-pages-artifact@56afc609...`, `actions/deploy-pages@d6db9016...`) satisfying all repository bootstrap security policies.
+
+## GitHub Pages deployment state and HTTPS enforcement
+
+The GitHub Pages state and deployment boundary is closed under the `PS-01` conformance contract (`model/pages_state.toml`, `crates/model/src/pages_state.rs`, `features/suites/pages-state.feature`, and `crates/conformance/tests/pages_state.rs`).
+The boundary establishes:
+- Non-zero accepted deployments to GitHub Pages under the `github-pages` environment on branch `main`;
+- Verified Actions deployment artifacts matching the 6-file browser closure and reproducible tree digest `sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194`;
+- Mandatory HTTPS enforcement and TLSv1.3 parameter verification with HSTS strict transport security;
+- Binding of deployment evidence to exact publisher revision and locked producer release commit `df50044df62eb0ef7ffebec2804561a9d16b5fc7`.
+
+## Independent live acceptance and stakeholder journey verification
+
+The independent live acceptance boundary is closed under the `LA-01` conformance contract (`model/live_acceptance.toml`, `crates/model/src/live_acceptance.rs`, `features/suites/live-acceptance.feature`, and `crates/conformance/tests/live_acceptance.rs`).
+The verification confirms:
+- **DEP-CHK-01**: Live HTTPS DNS and Origin Resolution returning HTTP 200 OK for `https://uor-foundation.github.io/foundry-web/`;
+- **DEP-CHK-02**: Live TLS Certificate and Strict Transport Security with valid handshake and HSTS headers;
+- **DEP-CHK-03**: Live Artifact Digest Byte Matching for all six browser closure assets (`index.html`, `foundry.js`, `foundry_bg.wasm`, `foundry.css`, `manifest.json`, `holo_runtime.holo`) against reproducible release digests;
+- **DEP-CHK-04**: Complete live stakeholder journey execution covering creation, isolation, ownership, recovery, and messaging without mock shortcuts;
+- **Negative & Rollback Controls**: Deterministic rollback trigger execution on live byte mismatch or core journey failure, reverting to previous known good commit.
+
+## Publication deployment closure
+
+The final publication deployment closure is closed under the `DC-01` conformance contract (`model/deployment_closure.toml`, `crates/model/src/deployment_closure.rs`, `features/suites/deployment-closure.feature`, and `crates/conformance/tests/deployment_closure.rs`).
+The closure verifies:
+- Complete satisfaction and closure of all required publication and live acceptance criteria across all 7 rows of the implementation matrix;
+- Zero deferred, bypassed, or unaccepted capabilities across the publisher boundary;
+- Complete platform scope integrity preserved, ensuring staged-core publication does not claim unaccepted platform scope;
+- Binding to exact producer release (`df50044df62eb0ef7ffebec2804561a9d16b5fc7`) and publisher target, ready for downstream PrismPM ecosystem-release closure reference.
 
 
 
