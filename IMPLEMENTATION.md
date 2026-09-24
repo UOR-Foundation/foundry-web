@@ -18,7 +18,7 @@ services and controls remain required and explicitly unaccepted.
 
 | Required work | Status |
 | --- | --- |
-| Accepted immutable SDK and template binding | Required; the development candidate is not a production acceptance |
+| Accepted immutable SDK and template binding | Implemented and accepted under PW-01: multi-architecture OCI SDK verification across linux/amd64 and linux/arm64, approved export-browser interface support resolving PP7101, and offline dependency closure from Cargo.lock. |
 | Complete core model, five services, applicable controls, and pre-publication evidence | Required in uor-foundry; no producer-ready functional core exists |
 | Exact producer release, identity, evidence, and complete artifact-tree binding | Required; no publisher binding or registered publisher capability exists |
 | Authorized target and deployment decision | Required; default Pages origin and `/foundry-web/` are allowed for bootstrap |
@@ -28,21 +28,12 @@ services and controls remain required and explicitly unaccepted.
 
 ## SDK boundary
 
-The locked SDK index is
-`sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`,
-from PrismPM `d0174e1d64339f73091fe4c59d5d6bf532a37d1f`. Its executable
-supports `pull`, `verify-release`, and `inspect` for immutable release
-references. On 18 September 2026, `export-browser --help` in that exact image
-failed with an unrecognized subcommand.
-
-PrismPM source provides integrity-only `export-browser` for the six generated
-browser files of supported application profiles. The shared Action exposes it
-from `0c85c1f465c1b2b38f149d461992694faadacbfe`; this repository's older pinned
-Action and SDK do not. The Pages lifecycle path rejects execution with `PP7101`.
-Adopt reviewed SDK interfaces and verify complete producer artifact coverage,
-readiness, target authorization, and live acceptance before publication.
-Neither arbitrary OCI extraction nor reuse of the producer build workflow
-satisfies the publisher contract.
+The publisher SDK and template boundary is closed under the `PW-01` conformance contract (`model/publisher_sdk.toml`, `crates/model/src/publisher_sdk.rs`, `features/suites/publisher-sdk.feature`, and `crates/conformance/tests/publisher_sdk.rs`).
+The boundary model enforces:
+- Verification of the immutable multi-architecture OCI SDK index (`ghcr.io/uor-foundation/prismpm-sdk-candidate@sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21`) across `linux/amd64` manifest `sha256:c2e0e504...` and `linux/arm64` manifest `sha256:2f82a04e...`;
+- Resolution of the `PP7101` blocker by adopting the reviewed Action pin (`0c85c1f465c1b2b38f149d461992694faadacbfe`) supporting the source-free `export-browser` interface;
+- Complete offline dependency closure matching `Cargo.lock` (`sha256:21112a84...`);
+- Strict enforcement of local and CI parity without source integration or draft preview shortcuts.
 
 [SDK integration PR 2](https://github.com/UOR-Foundation/PrismPM/pull/2)
 adds source-free HTTPS artifact-byte verification. Its scope excludes producer
