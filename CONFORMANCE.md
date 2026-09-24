@@ -18,6 +18,12 @@ The three honesty levels (R2):
 `cargo xtask audit-limits` fails if any code path returns an error the
 model does not sanction.
 
+## deployment-policy
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `DP-01` | `build` | The deployment policy and publication authorization boundary enforces approved origin and subpath target authorization (https://uor-foundation.github.io/foundry-web/), prohibits implicit routing or domain changes, binds GitHub Pages environment and branch protection ruleset prerequisites on main, and deterministically denies publication in unauthorized ref or execution contexts. |
+
 ## publisher-binding
 
 | ID | Level | Statement |

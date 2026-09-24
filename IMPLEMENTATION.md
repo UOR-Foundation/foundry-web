@@ -21,7 +21,7 @@ services and controls remain required and explicitly unaccepted.
 | Accepted immutable SDK and template binding | Implemented and accepted under PW-01: multi-architecture OCI SDK verification across linux/amd64 and linux/arm64, approved export-browser interface support resolving PP7101, and offline dependency closure from Cargo.lock. |
 | Complete core model, five services, applicable controls, and pre-publication evidence | Implemented and accepted in uor-foundry (PR-01, IC-01); producer functional core bound under PB-01. |
 | Exact producer release, identity, evidence, and complete artifact-tree binding | Implemented and accepted under PB-01: exact producer identity, six distribution assets, bit-for-bit reproducible tree digest, and signed pre-publication evidence. |
-| Authorized target and deployment decision | Required; default Pages origin and `/foundry-web/` are allowed for bootstrap |
+| Authorized target and deployment decision | Implemented and accepted under DP-01: target origin/path authorization (https://uor-foundation.github.io/foundry-web/), prohibition of implicit routing changes, protected-ref ruleset prerequisites on main, and deterministic denial of unauthorized contexts. |
 | SDK export and Actions publication of unchanged verified assets | Required; no Pages publication workflow exists |
 | Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks | Required; scaffold checks do not establish these behaviors |
 | Complete organizational platform and services | Required in uor-foundry; scope integrity enforced under PB-01 ensuring staged-core publication does not claim unaccepted platform scope. |
@@ -43,6 +43,18 @@ The binding enforces:
 - Full distribution artifact tree closure (`sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194`) with bit-for-bit identical reproducible build equality covering all six browser distribution assets (`index.html`, `foundry.js`, `foundry_bg.wasm`, `foundry.css`, `manifest.json`, `holo_runtime.holo`);
 - Signed pre-publication evidence in `PRODUCER_READY` state with binding digest `sha256:91bf34020a5664bead868fbfa89196b6e41bf1684fa6e3f8484196c342ebcb92` signed by `uor:authority:producer-pipeline-01`;
 - Explicit scope integrity enforcement preventing premature claims of complete platform acceptance (`platform_acceptance_claimed = false`), retaining staged-core boundaries, and tracking the four required live deployment checks (`DEP-CHK-01` through `DEP-CHK-04`).
+
+## Deployment policy and publication authorization
+
+The deployment policy and publication authorization boundary is closed under the `DP-01` conformance contract (`model/deployment_policy.toml`, `crates/model/src/deployment_policy.rs`, `features/suites/deployment-policy.feature`, and `crates/conformance/tests/deployment_policy.rs`).
+The contract enforces:
+- Target destination authorization strictly limited to `https://uor-foundation.github.io/foundry-web/`, prohibiting implicit routing or domain changes to `uor.foundation` (reserved for website project) or `app.uor.foundation`;
+- Mandatory HTTPS enforcement and rejection of unencrypted schemes;
+- Protected-ref release path requirement (`refs/heads/main`) backed by active repository ruleset `protected-main-publication` (ID 23917825) enforcing required status checks (`bootstrap/acceptance / ubuntu-24.04` and `ubuntu-24.04-arm`), blocking deletions, and blocking non-fast-forward pushes;
+- Environment authorization binding publication to the `github-pages` environment;
+- Deterministic denial and auditability for unauthorized refs (`refs/pull/*`, feature branches, drafts) and contexts;
+- Preflight deployment decision contract requiring complete prerequisite verification before publication and mandating rollback on failure.
+
 
 
 [SDK integration PR 2](https://github.com/UOR-Foundation/PrismPM/pull/2)
