@@ -32,3 +32,10 @@ level = "build"
 suite = "publisher-binding"
 statement = "The publisher binding establishes immutable verification of the exact authorized uor-foundry producer release identity, pre-publication evidence, and bit-for-bit reproducible artifact tree closure, while enforcing explicit dependency on complete producer platform acceptance without conflating staged core publication with full platform scope."
 
+[[id]]
+id = "DP-01"
+level = "build"
+suite = "deployment-policy"
+statement = "The deployment policy and publication authorization boundary enforces approved origin and subpath target authorization (https://uor-foundation.github.io/foundry-web/), prohibits implicit routing or domain changes, binds GitHub Pages environment and branch protection ruleset prerequisites on main, and deterministically denies publication in unauthorized ref or execution contexts."
+
+

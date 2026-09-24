@@ -12,10 +12,15 @@
 #![deny(missing_docs)]
 
 pub mod codegen;
+pub mod deployment_policy;
 pub mod publisher_binding;
 pub mod publisher_sdk;
 pub mod registry;
 
+pub use deployment_policy::{
+    AuthorizationConfig, DeploymentDecisionConfig, DeploymentPolicyConfig, DeploymentPolicyEngine,
+    DeploymentPolicyError, DeploymentPolicyPolicyConfig, TargetConfig,
+};
 pub use publisher_binding::{
     ArtifactTreeRecord, BrowserArtifactRecord, PrePublicationEvidenceRecord,
     ProducerIdentityRecord, PublisherBindingConfig, PublisherBindingEngine, PublisherBindingError,
@@ -42,6 +47,8 @@ pub struct Model {
     pub publisher_sdk: PublisherSdkConfig,
     /// `model/publisher_binding.toml`: Producer release binding, artifact tree, and scope integrity.
     pub publisher_binding: PublisherBindingConfig,
+    /// `model/deployment_policy.toml`: Authorized target, protected-ref ruleset, and deployment policy.
+    pub deployment_policy: DeploymentPolicyConfig,
 }
 
 /// A failure to load or to cross-check the model.
@@ -76,6 +83,7 @@ impl Model {
             authorities: read(dir, "authorities.toml")?,
             publisher_sdk: read(dir, "publisher_sdk.toml")?,
             publisher_binding: read(dir, "publisher_binding.toml")?,
+            deployment_policy: read(dir, "deployment_policy.toml")?,
         })
     }
 
@@ -88,13 +96,14 @@ impl Model {
     /// Cross-check the model against itself: every ID well formed, every claim
     /// well formed for its level, every `some-true` claim bound to an
     /// authority that exists (`CM-01` .. `CM-03`, R2), publisher SDK valid,
-    /// and publisher binding valid.
+    /// publisher binding valid, and deployment policy valid.
     pub fn check(&self) -> Result<(), ModelError> {
         self.ledger.check()?;
         self.check_ids()?;
         self.check_authorities()?;
         self.publisher_sdk.check()?;
         self.publisher_binding.check()?;
+        self.deployment_policy.check()?;
         Ok(())
     }
 

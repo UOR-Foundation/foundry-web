@@ -1,0 +1,61 @@
+# model/deployment_policy.toml --- Authorized target, deployment decision,
+# and publication authorization / security specification.
+#
+# Conformance ID: DP-01 (suite: deployment-policy)
+
+spec = "foundry/deployment-policy/1"
+stage = "staged-core"
+
+[policy]
+require_authorized_target = true
+require_protected_ref = true
+require_environment_authorization = true
+prohibit_implicit_routing_changes = true
+prohibit_unauthorized_contexts = true
+enforce_deterministic_denial = true
+require_rollback_on_failure = true
+
+[target]
+origin = "https://uor-foundation.github.io"
+subpath = "/foundry-web/"
+target_url = "https://uor-foundation.github.io/foundry-web/"
+allowed_origins = [
+    "https://uor-foundation.github.io"
+]
+disallowed_origins = [
+    "https://uor.foundation",
+    "https://app.uor.foundation",
+    "http://uor-foundation.github.io"
+]
+enforce_https = true
+
+[authorization]
+environment = "github-pages"
+authorized_refs = [
+    "refs/heads/main"
+]
+disallowed_refs = [
+    "refs/pull/*",
+    "refs/heads/feat/*",
+    "refs/heads/fix/*",
+    "refs/heads/draft/*"
+]
+ruleset_id = 23917825
+ruleset_name = "protected-main-publication"
+required_status_checks = [
+    "bootstrap/acceptance / ubuntu-24.04",
+    "bootstrap/acceptance / ubuntu-24.04-arm"
+]
+require_linear_history = false
+prevent_deletion = true
+prevent_non_fast_forward = true
+
+[deployment_decision]
+preflight_checks = [
+    "producer-binding-verified",
+    "target-origin-authorized",
+    "protected-ref-authorized",
+    "status-checks-green",
+    "source-free-export-verified"
+]
+failure_action = "DENY_AND_ROLLBACK"
