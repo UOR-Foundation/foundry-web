@@ -1,0 +1,27 @@
+# model/publisher_sdk.toml --- Accepted immutable SDK/template binding
+# and export-browser interface verification for publisher operations.
+#
+# Conformance ID: PW-01 (suite: publisher-sdk)
+
+spec = "foundry/publisher-sdk/1"
+stage = "staged-core"
+
+[policy]
+require_immutable_sdk_binding = true
+prohibit_source_integration = true
+prohibit_scaffold_only_acceptance = true
+require_multi_architecture_verification = true
+require_export_browser_interface = true
+
+[sdk_binding]
+image_repository = "ghcr.io/uor-foundation/prismpm-sdk-candidate"
+index_digest = "sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21"
+amd64_manifest_digest = "sha256:c2e0e50437e13d9b2e382d3af4ae7a962b469721b9b80f14f215d9254e8ed78f"
+arm64_manifest_digest = "sha256:2f82a04e8f8141636e03a219d3960e30d98a6f304828341dd47b553b3c23baeb"
+action_ref = "0c85c1f465c1b2b38f149d461992694faadacbfe"
+supports_export_browser = true
+
+[template_binding]
+template_commit = "e0e11ecb1b38e202116d9806887363848629d439"
+template_contract_spec = "template/1"
+cargo_lock_digest = "sha256:21112a84d412b18aa2f8fe0eeea206b026771ef827798ce02f43bbefb33fa4fe"

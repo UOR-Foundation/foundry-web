@@ -12,8 +12,13 @@
 #![deny(missing_docs)]
 
 pub mod codegen;
+pub mod publisher_sdk;
 pub mod registry;
 
+pub use publisher_sdk::{
+    PublisherSdkConfig, PublisherSdkEngine, PublisherSdkError, PublisherSdkPolicyConfig,
+    SdkBindingRecord, TemplateBindingRecord,
+};
 pub use registry::{Authorities, AuthorityRow, Claim, IdRow, Ids, Ledger, Level};
 
 use std::path::{Path, PathBuf};
@@ -27,6 +32,8 @@ pub struct Model {
     pub ids: Ids,
     /// `model/authorities.toml`: what this repository cites rather than proves.
     pub authorities: Authorities,
+    /// `model/publisher_sdk.toml`: Publisher SDK and template binding specification.
+    pub publisher_sdk: PublisherSdkConfig,
 }
 
 /// A failure to load or to cross-check the model.
@@ -59,6 +66,7 @@ impl Model {
             ledger: read(dir, "ledger.toml")?,
             ids: read(dir, "ids.toml")?,
             authorities: read(dir, "authorities.toml")?,
+            publisher_sdk: read(dir, "publisher_sdk.toml")?,
         })
     }
 
@@ -69,12 +77,13 @@ impl Model {
     }
 
     /// Cross-check the model against itself: every ID well formed, every claim
-    /// well formed for its level, and every `some-true` claim bound to an
-    /// authority that exists (`CM-01` .. `CM-03`, R2).
+    /// well formed for its level, every `some-true` claim bound to an
+    /// authority that exists (`CM-01` .. `CM-03`, R2), and publisher SDK valid.
     pub fn check(&self) -> Result<(), ModelError> {
         self.ledger.check()?;
         self.check_ids()?;
         self.check_authorities()?;
+        self.publisher_sdk.check()?;
         Ok(())
     }
 

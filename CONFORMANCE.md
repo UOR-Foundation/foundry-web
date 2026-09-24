@@ -18,6 +18,12 @@ The three honesty levels (R2):
 `cargo xtask audit-limits` fails if any code path returns an error the
 model does not sanction.
 
+## publisher-sdk
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `PW-01` | `build` | The publisher SDK and template boundary enforces immutable multi-architecture OCI SDK verification across linux/amd64 and linux/arm64, approved export-browser interfaces, offline dependency closure, and parity between local and CI execution contracts without source integration or draft preview shortcuts. |
+
 ## Cited authorities
 
 Never re-derived, vendored, or gated on.

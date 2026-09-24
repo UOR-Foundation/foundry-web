@@ -20,4 +20,8 @@
 
 spec = "template/1"
 
-id = []
+[[id]]
+id = "PW-01"
+level = "build"
+suite = "publisher-sdk"
+statement = "The publisher SDK and template boundary enforces immutable multi-architecture OCI SDK verification across linux/amd64 and linux/arm64, approved export-browser interfaces, offline dependency closure, and parity between local and CI execution contracts without source integration or draft preview shortcuts."
