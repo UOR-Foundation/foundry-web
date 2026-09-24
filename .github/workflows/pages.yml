@@ -34,41 +34,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p site
-
-          # Stage verified browser artifacts source-free
-          cat <<'EOF' > site/index.html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UOR Foundry Portal</title>
-  <link rel="stylesheet" href="foundry.css">
-  <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <div id="foundry-root">
-    <header>
-      <h1>UOR Foundry</h1>
-      <p>Accepted Production Publication</p>
-    </header>
-    <main id="app">
-      <div id="service-views"></div>
-    </main>
-  </div>
-  <script src="foundry.js"></script>
-</body>
-</html>
-EOF
-
-          echo "/* UOR Foundry Core Styles */" > site/foundry.css
-          echo "/* UOR Foundry Client Runtime */" > site/foundry.js
-          echo '{"name":"UOR Foundry","short_name":"Foundry","start_url":"/foundry-web/","display":"standalone"}' > site/manifest.json
-          printf '\x00asm\x01\x00\x00\x00' > site/foundry_bg.wasm
-          printf 'HOLO\x01\x00\x00\x00' > site/holo_runtime.holo
-
-          echo "Verified source-free browser closure export complete."
+          bash scripts/export_browser.sh site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa

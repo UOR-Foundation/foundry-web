@@ -18,11 +18,29 @@ The three honesty levels (R2):
 `cargo xtask audit-limits` fails if any code path returns an error the
 model does not sanction.
 
+## deployment-closure
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `DC-01` | `build` | The publication deployment closure enforces complete satisfaction of all required publication and live acceptance criteria, verifies zero outstanding gaps across implementation and conformance registers, and establishes accepted ecosystem release closure referencing verified production deployments. |
+
 ## deployment-policy
 
 | ID | Level | Statement |
 | --- | --- | --- |
 | `DP-01` | `build` | The deployment policy and publication authorization boundary enforces approved origin and subpath target authorization (https://uor-foundation.github.io/foundry-web/), prohibits implicit routing or domain changes, binds GitHub Pages environment and branch protection ruleset prerequisites on main, and deterministically denies publication in unauthorized ref or execution contexts. |
+
+## live-acceptance
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `LA-01` | `build` | The independent live acceptance boundary validates byte-for-byte asset matching for all six browser closure assets against deployed target endpoints, executes complete core stakeholder journeys for creation, isolation, ownership, recovery, and messaging, and proves full negative and rollback fault handling against accepted release identities. |
+
+## pages-state
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `PS-01` | `build` | The GitHub Pages state and deployment boundary establishes non-zero accepted deployments, verified Actions deployment artifacts, HTTPS target enforcement and TLS provisioning, and immutable binding to exact publisher revision and producer release identity. |
 
 ## publication-pipeline
 

@@ -1,0 +1,35 @@
+# model/pages_state.toml --- GitHub Pages deployment state,
+# verified artifacts, and HTTPS enforcement.
+#
+# Conformance ID: PS-01 (suite: pages-state)
+
+spec = "foundry/pages-state/1"
+stage = "staged-core"
+
+[policy]
+require_active_deployment = true
+require_https_enforcement = true
+require_pages_artifact_verification = true
+prohibit_unverified_pages_origin = true
+prohibit_stale_deployments = true
+
+[deployment_target]
+origin = "https://uor-foundation.github.io"
+subpath = "/foundry-web/"
+url = "https://uor-foundation.github.io/foundry-web/"
+environment = "github-pages"
+branch = "main"
+build_type = "workflow"
+min_deployment_count = 1
+
+[https_enforcement]
+enforced = true
+tls_version = "TLSv1.3"
+hsts_header = "max-age=31536000; includeSubDomains; preload"
+certificate_authority = "DigiCert / GitHub Pages"
+
+[artifact_verification]
+expected_artifact_name = "github-pages"
+expected_asset_count = 6
+expected_tree_digest = "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194"
+producer_commit = "df50044df62eb0ef7ffebec2804561a9d16b5fc7"

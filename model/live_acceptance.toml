@@ -1,0 +1,51 @@
+# model/live_acceptance.toml --- Independent live acceptance verification,
+# byte-for-byte deployment checks, and core journeys with rollback.
+#
+# Conformance ID: LA-01 (suite: live-acceptance)
+
+spec = "foundry/live-acceptance/1"
+stage = "staged-core"
+
+[policy]
+require_live_deployment_verification = true
+require_byte_for_byte_digest_matching = true
+require_all_core_journeys = true
+require_negative_and_rollback_checks = true
+prohibit_mock_network_shortcuts = true
+prohibit_unverified_payloads = true
+
+[target]
+url = "https://uor-foundation.github.io/foundry-web/"
+origin = "https://uor-foundation.github.io"
+subpath = "/foundry-web/"
+
+[[checks]]
+id = "DEP-CHK-01"
+name = "Live HTTPS DNS and Origin Resolution"
+method = "http-get-200-ok"
+expected_status = 200
+
+[[checks]]
+id = "DEP-CHK-02"
+name = "Live TLS Certificate and Strict Transport Security"
+method = "tls-handshake-hsts"
+expected_status = 200
+
+[[checks]]
+id = "DEP-CHK-03"
+name = "Live Artifact Digest Byte Matching"
+method = "sha256-payload-comparison"
+expected_status = 200
+
+[[checks]]
+id = "DEP-CHK-04"
+name = "Live Stakeholder Journey Walkthrough"
+method = "full-service-browser-evaluation"
+expected_status = 200
+
+[rollback]
+require_atomic_rollback = true
+rollback_trigger_on_byte_mismatch = true
+rollback_trigger_on_journey_failure = true
+rollback_timeout_seconds = 300
+previous_known_good_commit = "83f27747d3ed"

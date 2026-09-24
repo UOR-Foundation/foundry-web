@@ -1,0 +1,55 @@
+# model/deployment_closure.toml --- Final deployment closure and
+# full publication verification matrix.
+#
+# Conformance ID: DC-01 (suite: deployment-closure)
+
+spec = "foundry/deployment-closure/1"
+stage = "staged-core"
+
+[policy]
+production_deployment_accepted = true
+all_implementation_rows_closed = true
+ecosystem_closure_ready = true
+platform_scope_integrity_preserved = true
+
+[closure_evidence]
+publisher_repository = "https://github.com/UOR-Foundation/foundry-web"
+producer_repository = "https://github.com/UOR-Foundation/uor-foundry"
+producer_release_commit = "df50044df62eb0ef7ffebec2804561a9d16b5fc7"
+target_deployment_url = "https://uor-foundation.github.io/foundry-web/"
+closure_verdict = "ACCEPTED_AND_CLOSED"
+
+[[implementation_matrix]]
+requirement = "Complete core model, five services, applicable controls, and pre-publication evidence"
+status = "ACCEPTED"
+conformance_authority = "PB-01"
+
+[[implementation_matrix]]
+requirement = "Exact producer release, identity, evidence, and complete artifact-tree binding"
+status = "ACCEPTED"
+conformance_authority = "PB-01"
+
+[[implementation_matrix]]
+requirement = "Authorized target and deployment decision"
+status = "ACCEPTED"
+conformance_authority = "DP-01"
+
+[[implementation_matrix]]
+requirement = "SDK export and Actions publication of unchanged verified assets"
+status = "ACCEPTED"
+conformance_authority = "PP-01"
+
+[[implementation_matrix]]
+requirement = "Pages deployment, artifacts, and HTTPS enforcement"
+status = "ACCEPTED"
+conformance_authority = "PS-01"
+
+[[implementation_matrix]]
+requirement = "Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks"
+status = "ACCEPTED"
+conformance_authority = "LA-01"
+
+[[implementation_matrix]]
+requirement = "Complete organizational platform and services"
+status = "SCOPE_PRESERVED"
+conformance_authority = "PB-01"
