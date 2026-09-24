@@ -12,9 +12,15 @@
 #![deny(missing_docs)]
 
 pub mod codegen;
+pub mod publisher_binding;
 pub mod publisher_sdk;
 pub mod registry;
 
+pub use publisher_binding::{
+    ArtifactTreeRecord, BrowserArtifactRecord, PrePublicationEvidenceRecord,
+    ProducerIdentityRecord, PublisherBindingConfig, PublisherBindingEngine, PublisherBindingError,
+    PublisherBindingPolicyConfig, ScopeIntegrityRecord,
+};
 pub use publisher_sdk::{
     PublisherSdkConfig, PublisherSdkEngine, PublisherSdkError, PublisherSdkPolicyConfig,
     SdkBindingRecord, TemplateBindingRecord,
@@ -34,6 +40,8 @@ pub struct Model {
     pub authorities: Authorities,
     /// `model/publisher_sdk.toml`: Publisher SDK and template binding specification.
     pub publisher_sdk: PublisherSdkConfig,
+    /// `model/publisher_binding.toml`: Producer release binding, artifact tree, and scope integrity.
+    pub publisher_binding: PublisherBindingConfig,
 }
 
 /// A failure to load or to cross-check the model.
@@ -67,6 +75,7 @@ impl Model {
             ids: read(dir, "ids.toml")?,
             authorities: read(dir, "authorities.toml")?,
             publisher_sdk: read(dir, "publisher_sdk.toml")?,
+            publisher_binding: read(dir, "publisher_binding.toml")?,
         })
     }
 
@@ -78,12 +87,14 @@ impl Model {
 
     /// Cross-check the model against itself: every ID well formed, every claim
     /// well formed for its level, every `some-true` claim bound to an
-    /// authority that exists (`CM-01` .. `CM-03`, R2), and publisher SDK valid.
+    /// authority that exists (`CM-01` .. `CM-03`, R2), publisher SDK valid,
+    /// and publisher binding valid.
     pub fn check(&self) -> Result<(), ModelError> {
         self.ledger.check()?;
         self.check_ids()?;
         self.check_authorities()?;
         self.publisher_sdk.check()?;
+        self.publisher_binding.check()?;
         Ok(())
     }
 

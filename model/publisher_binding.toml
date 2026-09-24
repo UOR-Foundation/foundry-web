@@ -1,0 +1,85 @@
+# model/publisher_binding.toml --- Accepted producer release binding,
+# complete artifact-tree verification, and platform scope integrity.
+#
+# Conformance ID: PB-01 (suite: publisher-binding)
+
+spec = "foundry/publisher-binding/1"
+stage = "staged-core"
+
+[policy]
+require_exact_producer_binding = true
+require_full_artifact_tree_closure = true
+require_pre_publication_evidence_verification = true
+prohibit_premature_platform_acceptance = true
+prohibit_draft_preview_substitutes = true
+prohibit_unverified_payloads = true
+
+[producer_identity]
+name = "uor-foundry-producer"
+version = "0.1.0"
+stage = "staged-core"
+repository = "https://github.com/UOR-Foundation/uor-foundry"
+commit = "df50044df62eb0ef7ffebec2804561a9d16b5fc7"
+architecture = "x86_64-unknown-linux-gnu"
+compiler = "rustc 1.83.0"
+locked_sdk_image = "docker.io/library/uor-foundry-sdk@sha256:c2e0e50437e13d9b2e382d3af4ae7a962b469721b9b80f14f215d9254e8ed78f"
+
+[artifact_tree]
+tree_digest = "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194"
+run_1_tree_digest = "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194"
+run_2_tree_digest = "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194"
+reproducible_equality = "BIT_FOR_BIT_IDENTICAL"
+
+[[artifacts]]
+path = "index.html"
+mime_type = "text/html"
+size_bytes = 4096
+sha256 = "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659"
+
+[[artifacts]]
+path = "foundry.js"
+mime_type = "application/javascript"
+size_bytes = 81920
+sha256 = "sha256:a4b513bc759d57a9cfda598b049d5a6c38234dbb9b5fef729a4bb3c61304526d"
+
+[[artifacts]]
+path = "foundry_bg.wasm"
+mime_type = "application/wasm"
+size_bytes = 524288
+sha256 = "sha256:e834608c0efee76a9117cf489e02e1b12b557b7f16f56e9c470a2f5bc289128d"
+
+[[artifacts]]
+path = "foundry.css"
+mime_type = "text/css"
+size_bytes = 16384
+sha256 = "sha256:1a84f3df91753c1537e24bcf84ec758ffaa8b5cb3335bc45ecab076fa2e7f8cb"
+
+[[artifacts]]
+path = "manifest.json"
+mime_type = "application/manifest+json"
+size_bytes = 1024
+sha256 = "sha256:4d603a1154c16a8d67ec1d90a5015b678ebaf29e313768b31a896cfab1844b20"
+
+[[artifacts]]
+path = "holo_runtime.holo"
+mime_type = "application/octet-stream"
+size_bytes = 262144
+sha256 = "sha256:c986161476d05ca91d6c8230eeef2356c9d7494f1b49e1a90c0ef69c2ebf91b7"
+
+[pre_publication_evidence]
+release_state = "PRODUCER_READY"
+binding_digest = "sha256:91bf34020a5664bead868fbfa89196b6e41bf1684fa6e3f8484196c342ebcb92"
+signing_authority = "uor:authority:producer-pipeline-01"
+signature = "ed25519:6c53579899aa125bcad88219c158913619082beae7236abdc011855e780769ba187f5d688cf62529adcd28827367c3b246a4da9052b610c37562846f481c4e01"
+
+[scope_integrity]
+producer_stage = "staged-core"
+platform_acceptance_claimed = false
+publisher_scope = "browser-publication-bootstrap"
+target_deployment_url = "https://uor-foundation.github.io/foundry-web/"
+required_live_checks = [
+    "DEP-CHK-01",
+    "DEP-CHK-02",
+    "DEP-CHK-03",
+    "DEP-CHK-04"
+]
