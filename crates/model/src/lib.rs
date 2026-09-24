@@ -13,6 +13,7 @@
 
 pub mod codegen;
 pub mod deployment_policy;
+pub mod publication_pipeline;
 pub mod publisher_binding;
 pub mod publisher_sdk;
 pub mod registry;
@@ -20,6 +21,10 @@ pub mod registry;
 pub use deployment_policy::{
     AuthorizationConfig, DeploymentDecisionConfig, DeploymentPolicyConfig, DeploymentPolicyEngine,
     DeploymentPolicyError, DeploymentPolicyPolicyConfig, TargetConfig,
+};
+pub use publication_pipeline::{
+    PipelineAssetRecord, PipelineWorkflowConfig, PublicationPipelineConfig,
+    PublicationPipelineEngine, PublicationPipelineError, PublicationPipelinePolicyConfig,
 };
 pub use publisher_binding::{
     ArtifactTreeRecord, BrowserArtifactRecord, PrePublicationEvidenceRecord,
@@ -49,6 +54,8 @@ pub struct Model {
     pub publisher_binding: PublisherBindingConfig,
     /// `model/deployment_policy.toml`: Authorized target, protected-ref ruleset, and deployment policy.
     pub deployment_policy: DeploymentPolicyConfig,
+    /// `model/publication_pipeline.toml`: Source-free export-browser and Actions publication specification.
+    pub publication_pipeline: PublicationPipelineConfig,
 }
 
 /// A failure to load or to cross-check the model.
@@ -84,6 +91,7 @@ impl Model {
             publisher_sdk: read(dir, "publisher_sdk.toml")?,
             publisher_binding: read(dir, "publisher_binding.toml")?,
             deployment_policy: read(dir, "deployment_policy.toml")?,
+            publication_pipeline: read(dir, "publication_pipeline.toml")?,
         })
     }
 
@@ -96,7 +104,7 @@ impl Model {
     /// Cross-check the model against itself: every ID well formed, every claim
     /// well formed for its level, every `some-true` claim bound to an
     /// authority that exists (`CM-01` .. `CM-03`, R2), publisher SDK valid,
-    /// publisher binding valid, and deployment policy valid.
+    /// publisher binding valid, deployment policy valid, and publication pipeline valid.
     pub fn check(&self) -> Result<(), ModelError> {
         self.ledger.check()?;
         self.check_ids()?;
@@ -104,6 +112,7 @@ impl Model {
         self.publisher_sdk.check()?;
         self.publisher_binding.check()?;
         self.deployment_policy.check()?;
+        self.publication_pipeline.check()?;
         Ok(())
     }
 

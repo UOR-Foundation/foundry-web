@@ -22,7 +22,7 @@ services and controls remain required and explicitly unaccepted.
 | Complete core model, five services, applicable controls, and pre-publication evidence | Implemented and accepted in uor-foundry (PR-01, IC-01); producer functional core bound under PB-01. |
 | Exact producer release, identity, evidence, and complete artifact-tree binding | Implemented and accepted under PB-01: exact producer identity, six distribution assets, bit-for-bit reproducible tree digest, and signed pre-publication evidence. |
 | Authorized target and deployment decision | Implemented and accepted under DP-01: target origin/path authorization (https://uor-foundation.github.io/foundry-web/), prohibition of implicit routing changes, protected-ref ruleset prerequisites on main, and deterministic denial of unauthorized contexts. |
-| SDK export and Actions publication of unchanged verified assets | Required; no Pages publication workflow exists |
+| SDK export and Actions publication of unchanged verified assets | Implemented and accepted under PP-01: source-free export of six-file browser closure, pre-upload artifact digest and tree integrity verification, and publication workflow (.github/workflows/pages.yml) deploying unchanged assets to GitHub Pages. |
 | Independent live byte, creation, isolation, ownership, recovery, messaging, negative, and rollback checks | Required; scaffold checks do not establish these behaviors |
 | Complete organizational platform and services | Required in uor-foundry; scope integrity enforced under PB-01 ensuring staged-core publication does not claim unaccepted platform scope. |
 
@@ -54,6 +54,16 @@ The contract enforces:
 - Environment authorization binding publication to the `github-pages` environment;
 - Deterministic denial and auditability for unauthorized refs (`refs/pull/*`, feature branches, drafts) and contexts;
 - Preflight deployment decision contract requiring complete prerequisite verification before publication and mandating rollback on failure.
+
+## Publication pipeline and Actions publication
+
+The publication pipeline boundary is closed under the `PP-01` conformance contract (`model/publication_pipeline.toml`, `crates/model/src/publication_pipeline.rs`, `.github/workflows/pages.yml`, `features/suites/publication-pipeline.feature`, and `crates/conformance/tests/publication_pipeline.rs`).
+The pipeline enforces:
+- Source-free export of the verified six-file browser closure (`index.html`, `foundry.js`, `foundry_bg.wasm`, `foundry.css`, `manifest.json`, `holo_runtime.holo`) without Rust compiler or build tool invocation;
+- Pre-upload byte and tree digest verification matching `sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194`;
+- Dedicated GitHub Actions publication workflow (`.github/workflows/pages.yml`) deploying unchanged verified assets to the `github-pages` environment on `main`;
+- Pinned, immutable action dependencies (`actions/checkout@11bd7190...`, `actions/upload-pages-artifact@56afc609...`, `actions/deploy-pages@d6db9016...`) satisfying all repository bootstrap security policies.
+
 
 
 
