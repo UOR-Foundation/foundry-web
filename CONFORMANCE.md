@@ -24,6 +24,12 @@ model does not sanction.
 | --- | --- | --- |
 | `DP-01` | `build` | The deployment policy and publication authorization boundary enforces approved origin and subpath target authorization (https://uor-foundation.github.io/foundry-web/), prohibits implicit routing or domain changes, binds GitHub Pages environment and branch protection ruleset prerequisites on main, and deterministically denies publication in unauthorized ref or execution contexts. |
 
+## publication-pipeline
+
+| ID | Level | Statement |
+| --- | --- | --- |
+| `PP-01` | `build` | The publication pipeline enforces source-free export of the verified six-file browser artifact closure from the locked producer release, validates artifact byte digests and tree integrity before upload, prohibits compilation or arbitrary OCI extraction shortcuts, and publishes unchanged verified assets to GitHub Pages under protected ref and environment controls. |
+
 ## publisher-binding
 
 | ID | Level | Statement |

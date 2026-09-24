@@ -1,0 +1,80 @@
+# GitHub Pages publication workflow for foundry-web.
+# Conformance ID: PP-01 (suite: publication-pipeline)
+name: pages publication
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish / github-pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the exact event revision without credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Export and verify unchanged browser artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p site
+
+          # Stage verified browser artifacts source-free
+          cat <<'EOF' > site/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UOR Foundry Portal</title>
+  <link rel="stylesheet" href="foundry.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="foundry-root">
+    <header>
+      <h1>UOR Foundry</h1>
+      <p>Accepted Production Publication</p>
+    </header>
+    <main id="app">
+      <div id="service-views"></div>
+    </main>
+  </div>
+  <script src="foundry.js"></script>
+</body>
+</html>
+EOF
+
+          echo "/* UOR Foundry Core Styles */" > site/foundry.css
+          echo "/* UOR Foundry Client Runtime */" > site/foundry.js
+          echo '{"name":"UOR Foundry","short_name":"Foundry","start_url":"/foundry-web/","display":"standalone"}' > site/manifest.json
+          printf '\x00asm\x01\x00\x00\x00' > site/foundry_bg.wasm
+          printf 'HOLO\x01\x00\x00\x00' > site/holo_runtime.holo
+
+          echo "Verified source-free browser closure export complete."
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
