@@ -12,3 +12,11 @@ Feature: Publication pipeline and Actions publication
     And compiler invocation and arbitrary OCI extraction shortcuts are prohibited
     And the six-file browser closure matches expected asset digests and tree integrity
     And pinned upload-pages-artifact and deploy-pages actions are used
+
+  @PP-01 @build
+  Scenario: Missing authority never manufactures a browser application
+    Given no accepted immutable producer release is selected
+    When the actual browser exporter is executed in a clean source-free directory
+    Then export fails without creating the destination
+    And adjacent producer builds and existing site files cannot supply a substitute
+    And failed SDK verification prevents artifact publication

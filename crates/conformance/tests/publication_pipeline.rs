@@ -42,9 +42,25 @@ fn publication_pipeline_verifies_source_free_export_and_actions_workflow_pp_01()
     .expect("exported closure matches 6-file profile and tree digest");
 
     // 3. Verify source-free export contract
-    let export_script = "mkdir -p site && export_browser_closure";
-    PublicationPipelineEngine::verify_source_free_export(cfg, export_script)
+    let export_script = std::fs::read_to_string(root.join("scripts/export_browser.sh"))
+        .expect("read actual exporter, not an invented fixture");
+    PublicationPipelineEngine::verify_source_free_export(cfg, &export_script)
         .expect("source-free export verified without compilation");
+}
+
+/// Executes the exporter against missing, unaccepted and substituted inputs.
+/// These regression checks do not establish product or deployment acceptance.
+#[test]
+fn actual_exporter_refuses_missing_producer_without_manufacturing_assets_pp_01() {
+    let status = std::process::Command::new("node")
+        .args(["--test", "tests/publication/source-free-export.test.mjs"])
+        .current_dir(repo_model::repo_root())
+        .status()
+        .expect("the locked SDK supplies Node for publication verification");
+    assert!(
+        status.success(),
+        "actual source-free export regressions failed"
+    );
 }
 
 #[test]

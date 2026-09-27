@@ -1,0 +1,13 @@
+{
+  "name": "foundry-web-verification",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/publication/*.test.mjs",
+    "audit:deployed": "node tests/e2e/audit-deployed.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1"
+  }
+}

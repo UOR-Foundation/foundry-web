@@ -3,44 +3,107 @@
 name: pages publication
 
 on:
-  push:
+  workflow_run:
+    workflows: [bootstrap]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+permissions: {}
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: publish / github-pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  export:
+    name: verify / immutable producer export
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      revision: ${{ steps.identity.outputs.revision }}
+      sdk-image: ${{ steps.identity.outputs.sdk-image }}
     steps:
       - name: Check out the exact event revision without credentials
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Export and verify unchanged browser artifacts
-        shell: bash
+      - name: Require successful complete bootstrap on this exact current main revision
+        id: identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           set -euo pipefail
-          bash scripts/export_browser.sh site
+          test "$PUBLISH_SHA" = "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/bootstrap.yml/runs?head_sha=$PUBLISH_SHA&status=success&per_page=100" |
+            jq -e --arg sha "$PUBLISH_SHA" --arg repo "$GITHUB_REPOSITORY" \
+              'any(.workflow_runs[]; .head_sha == $sha and .head_branch == "main" and .head_repository.full_name == $repo and (.event == "push" or .event == "workflow_dispatch") and .conclusion == "success")'
+          image=$(sed -n 's/.*"sdk_image":"\([^"]*\)".*/\1/p' prismpm.lock)
+          [[ $image =~ ^[a-z0-9.-]+(:[0-9]{1,5})?/[a-z0-9./_-]+@sha256:[0-9a-f]{64}$ ]]
+          printf 'revision=%s\nsdk-image=%s\n' "$PUBLISH_SHA" "$image" >> "$GITHUB_OUTPUT"
+
+      - name: Export and verify unchanged browser artifacts
+        env:
+          SDK_IMAGE: ${{ steps.identity.outputs.sdk-image }}
+        run: |
+          set -euo pipefail
+          docker pull "$SDK_IMAGE"
+          docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
+            --entrypoint bash "$SDK_IMAGE" scripts/export_browser.sh site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         with:
           path: site
 
+  publish:
+    name: publish / github-pages
+    needs: export
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+
+  audit-live:
+    name: audit / deployed application (not acceptance)
+    needs: [export, publish]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ needs.export.outputs.revision }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Audit public assets and every visible view in three browser engines
+        env:
+          SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
+        run: |
+          set -euo pipefail
+          docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
+            --entrypoint bash "$SDK_IMAGE" -c \
+            'npm ci --ignore-scripts --no-audit --no-fund && npm run audit:deployed'
