@@ -56,6 +56,7 @@ try {
     || receipt.release_digest !== trust.release_digest || receipt.output !== output
     || !['model_digest', 'build_digest', 'tree_digest'].every(key => receipt[key] === release[key])
     || !Array.isArray(receipt.files) || !receipt.files.length) throw new Error('Export is not bound to the selected release');
+  if (!lstatSync(output).isDirectory()) throw new Error('Export root is not an ordinary directory');
   const actual = walk(output);
   if (new Set(receipt.files.map(file => file.path)).size !== receipt.files.length
     || JSON.stringify(actual) !== JSON.stringify(receipt.files.map(file => file.path).sort())) {

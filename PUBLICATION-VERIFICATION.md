@@ -53,5 +53,11 @@ from synthetic metadata, ignoring it, or removing its obligation is prohibited.
 On the correction branch, the complete locked-devcontainer `just vv` passes
 template/SDK checks, model validation, formatting and warnings-denied Clippy,
 then fails DC-01 because production acceptance is false. The publication unit
-suite passes 10/10 Rust cases and 25/25 actual-wrapper process regressions.
+suite passes 10/10 Rust cases and 26/26 actual-wrapper process regressions.
 Pinned actionlint accepts all workflows. These results do not close DC-01.
+
+Independent review identified output-root symlink substitution and a main-ref
+advance during export. A planted root-symlink process double first made the
+wrapper accept the substituted directory; the explicit directory check rejects
+it. Deployment rechecks current main immediately before the privileged action.
+These guards do not claim an atomic transaction with GitHub branch updates.

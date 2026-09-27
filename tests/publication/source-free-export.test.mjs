@@ -86,6 +86,7 @@ if (command === 'export-browser') {
   if (defect === 'missing-file') fs.unlinkSync(output + '/index.html');
   if (defect === 'symlink') { fs.unlinkSync(output + '/index.html'); fs.symlinkSync('../calls.jsonl', output + '/index.html'); }
   if (defect === 'hardlink') fs.linkSync(output + '/index.html', 'second-link');
+  if (defect === 'root-symlink') { fs.renameSync(output, 'substituted-root'); fs.symlinkSync('substituted-root', output, 'dir'); }
   result = {
     schema: 'prismpm/browser-export/1', reference: selected.reference,
     release_digest: selected.reference.split('@')[1], output,
@@ -106,7 +107,7 @@ process.stdout.write(defect === 'invalid-json' ? 'not a receipt' : JSON.stringif
 }
 for (const defect of ['lock-failure', 'pull-failure', 'verify-release-failure', 'export-browser-failure',
   'invalid-json', 'unverified', 'candidate', 'wrong-policy', 'wrong-release', 'wrong-model', 'wrong-build', 'wrong-tree',
-  'extra-file', 'missing-file', 'symlink', 'hardlink', 'wrong-size', 'wrong-digest', 'duplicate-file', 'traversal']) {
+  'extra-file', 'missing-file', 'symlink', 'root-symlink', 'hardlink', 'wrong-size', 'wrong-digest', 'duplicate-file', 'traversal']) {
   test(`actual exporter rejects ${defect} at its SDK process boundary`, t => {
     const { root, env } = sdkBoundary(t, defect);
     const result = run(root, 'site', env);
