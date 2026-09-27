@@ -6,28 +6,56 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium, firefox, webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { regular, selectedProducer, bindBrowserReceipt } from '../../scripts/publication-sdk.mjs';
 
-const target = new URL(process.argv[2] ?? 'https://uor-foundation.github.io/foundry-web/');
+if (process.argv.length > 3) throw new Error('Expected one URL or --selected');
+const selected = process.argv[2] === '--selected' ? selectedProducer() : null;
+const target = new URL(selected?.target ?? process.argv[2] ?? 'https://uor-foundation.github.io/foundry-web/');
 if (target.protocol !== 'https:' || target.username || target.password || target.search || target.hash
   || !target.pathname.endsWith('/')) throw new Error('Expected an explicit HTTPS application base URL');
+const integrity = selected ? JSON.parse(regular('reports/publication/integrity.json')) : null;
+if (integrity) bindBrowserReceipt(integrity, selected.release, { target: target.href });
 const output = resolve('reports/deployed-audit');
 await mkdir(output, { recursive: true });
 const report = {
   schema: 'foundry/deployed-audit/1', target: target.href,
   observed_at: new Date().toISOString(), acceptance: 'not-established',
-  assets: [], browsers: [], failures: [],
+  release_reference: selected?.release.reference ?? null,
+  transport: null, assets: [], browsers: [], failures: [],
 };
 const failure = (boundary, message) => report.failures.push({ boundary, message });
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
-for (const path of ['index.html', 'foundry.js', 'foundry.css', 'foundry_bg.wasm', 'holo_runtime.holo', 'manifest.json']) {
+try {
+  const insecure = new URL(target);
+  insecure.protocol = 'http:';
+  const response = await fetch(insecure, { redirect: 'manual', signal: AbortSignal.timeout(30000) });
+  const location = response.headers.get('location');
+  report.transport = { http_status: response.status, location };
+  if (response.body) await response.body.cancel();
+  if (![301, 302, 303, 307, 308].includes(response.status) || !location
+    || new URL(location, insecure).href !== target.href) {
+    failure('transport', 'HTTP does not redirect to the exact HTTPS application target');
+  }
+} catch (error) { failure('transport', `HTTP upgrade was not established: ${error.message}`); }
+
+// The unbound diagnostic inspects the audited legacy deployment only. CI must
+// use the actual SDK inventory, never the legacy filenames as an output model.
+const paths = integrity ? integrity.files.map(file => file.path)
+  : ['index.html', 'foundry.js', 'foundry.css', 'foundry_bg.wasm', 'holo_runtime.holo', 'manifest.json'];
+for (const path of paths) {
   try {
     const response = await fetch(new URL(path, target), { redirect: 'error', signal: AbortSignal.timeout(30000) });
     const bytes = Buffer.from(await response.arrayBuffer());
+    const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
     report.assets.push({ path, status: response.status, size: bytes.length,
-      digest: `sha256:${createHash('sha256').update(bytes).digest('hex')}`,
+      digest,
       content_type: response.headers.get('content-type') });
     if (!response.ok) failure('assets', `${path}: HTTP ${response.status}`);
+    const expected = integrity?.files.find(file => file.path === path);
+    if (expected && (bytes.length !== expected.size || digest !== expected.digest)) {
+      failure('assets', `${path}: bytes differ from the independently verified release observation`);
+    }
     if (path.endsWith('.wasm')) {
       const exports = WebAssembly.Module.exports(new WebAssembly.Module(bytes));
       if (!exports.some(item => item.kind === 'function')) failure('runtime', 'Wasm exports no executable function');

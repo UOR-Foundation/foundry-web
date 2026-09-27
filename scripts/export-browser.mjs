@@ -1,23 +1,10 @@
 // Publication infrastructure only. Never generates or patches application bytes.
-import { readFileSync, lstatSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { lstatSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
+import { regular, sdk, selectedProducer, verifyProducer, bindBrowserReceipt } from './publication-sdk.mjs';
 
 const sha = bytes => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
-const digest = value => typeof value === 'string' && /^sha256:[0-9a-f]{64}$/.test(value);
-function sdk(...args) {
-  const result = spawnSync('prismpm', ['--json', ...args], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout: 20 * 60 * 1000 });
-  if (result.error || result.signal || result.status !== 0) {
-    throw new Error(`locked SDK ${args[0]} failed: ${result.error?.message ?? result.stderr ?? result.signal}`);
-  }
-  return JSON.parse(result.stdout);
-}
-function regular(path) {
-  const stat = lstatSync(path);
-  if (!stat.isFile() || stat.nlink !== 1) throw new Error(`Not a singly-linked regular file: ${path}`);
-  return readFileSync(path);
-}
 function walk(root, prefix = '') {
   return readdirSync(join(root, prefix), { withFileTypes: true }).flatMap(entry => {
     const path = prefix ? `${prefix}/${entry.name}` : entry.name;
@@ -31,31 +18,13 @@ try {
   if (process.argv.length !== 3 || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(output ?? '')) {
     throw new Error('Output must be one new portable directory name');
   }
-  const selection = JSON.parse(regular('model/publication.json'));
-  if (selection.schema !== 'foundry/publication-selection/1'
-    || selection.target !== 'https://uor-foundation.github.io/foundry-web/') throw new Error('Unreviewed publication target or schema');
-  const release = selection.release;
-  if (!release) throw new Error('No accepted immutable producer release is selected; application publication is refused');
-  if (!/^ghcr\.io\/uor-foundation\/uor-foundry@sha256:[0-9a-f]{64}$/.test(release.reference ?? '')
-    || !['policy_digest', 'model_digest', 'build_digest', 'tree_digest'].every(key => digest(release[key]))) {
-    throw new Error('Producer selection must bind the reviewed repository and exact release, signing policy, model, build, and browser-tree digests');
-  }
+  const { release } = selectedProducer();
   try { lstatSync(output); throw new Error('Export destination already exists'); }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
 
-  sdk('lock', 'check');
-  sdk('pull', release.reference);
-  const trust = sdk('verify-release', release.reference);
-  if (trust.schema !== 'prismpm/signature-closure-result/1' || trust.verified !== true
-    || trust.status !== 'accepted' || trust.release_digest !== release.reference.split('@')[1]
-    || trust.policy_digest !== release.policy_digest) {
-    throw new Error('Release signature closure is not accepted for the selected producer');
-  }
+  verifyProducer(release);
   const receipt = sdk('export-browser', release.reference, '--output', output);
-  if (receipt.schema !== 'prismpm/browser-export/1' || receipt.reference !== release.reference
-    || receipt.release_digest !== trust.release_digest || receipt.output !== output
-    || !['model_digest', 'build_digest', 'tree_digest'].every(key => receipt[key] === release[key])
-    || !Array.isArray(receipt.files) || !receipt.files.length) throw new Error('Export is not bound to the selected release');
+  bindBrowserReceipt(receipt, release, { output });
   if (!lstatSync(output).isDirectory()) throw new Error('Export root is not an ordinary directory');
   const actual = walk(output);
   if (new Set(receipt.files.map(file => file.path)).size !== receipt.files.length

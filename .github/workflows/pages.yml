@@ -60,7 +60,9 @@ jobs:
         run: |
           set -euo pipefail
           docker pull "$SDK_IMAGE"
+          chmod go-w "$PWD"
           docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
             --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
             --entrypoint bash "$SDK_IMAGE" scripts/export_browser.sh site
 
@@ -106,12 +108,31 @@ jobs:
           ref: ${{ needs.export.outputs.revision }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Replay exact live byte integrity through the locked SDK
+        env:
+          SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
+        run: |
+          set -euo pipefail
+          chmod go-w "$PWD"
+          docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
+            --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
+            --entrypoint node "$SDK_IMAGE" scripts/verify-publication.mjs
       - name: Audit public assets and every visible view in three browser engines
         env:
           SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
         run: |
           set -euo pipefail
           docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
             --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
             --entrypoint bash "$SDK_IMAGE" -c \
-            'npm ci --ignore-scripts --no-audit --no-fund && npm run audit:deployed'
+            'npm ci --cache /tmp/foundry-publisher-npm --ignore-scripts --no-audit --no-fund && npm run audit:deployed -- --selected'
+      - name: Retain observations and negative-audit diagnostics
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: publication-observations-${{ github.run_id }}-${{ github.run_attempt }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14

@@ -54,10 +54,13 @@ test('source-free export requires the reviewed repository and digest, not a tag'
 function sdkBoundary(t, defect) {
   const bytes = Buffer.from('fixture bytes, not a Foundry application');
   const fileDigest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+  const files = ['app.css', 'app.js', 'foundry.js', 'foundry_bg.wasm', 'index.html', 'provenance.json']
+    .map(path => ({ digest: fileDigest, path, size: bytes.length }));
+  const treeDigest = `sha256:${createHash('sha256').update(JSON.stringify(files)).digest('hex')}`;
   const release = {
     reference: `ghcr.io/uor-foundation/uor-foundry@sha256:${'a'.repeat(64)}`,
     model_digest: `sha256:${'b'.repeat(64)}`, build_digest: `sha256:${'c'.repeat(64)}`,
-    tree_digest: `sha256:${'d'.repeat(64)}`,
+    tree_digest: treeDigest,
     policy_digest: `sha256:${'e'.repeat(64)}`,
   };
   const root = isolated(t, { ...selection, release });
@@ -74,6 +77,7 @@ if (defect === command + '-failure') process.exit(7);
 let result = {};
 if (command === 'verify-release') result = {
   schema: 'prismpm/signature-closure-result/1', verified: defect !== 'unverified',
+  release_signatures: 1, promotion_signatures: 2, deployment_evidence_signatures: 1,
   status: defect === 'candidate' ? 'candidate' : 'accepted',
   policy_digest: defect === 'wrong-policy' ? 'sha256:' + '0'.repeat(64) : selected.policy_digest,
   release_digest: defect === 'wrong-release' ? 'sha256:' + '0'.repeat(64) : selected.reference.split('@')[1]
@@ -81,7 +85,7 @@ if (command === 'verify-release') result = {
 if (command === 'export-browser') {
   const output = args[4];
   fs.mkdirSync(output);
-  fs.writeFileSync(output + '/index.html', ${JSON.stringify(bytes.toString())});
+  for (const file of ${JSON.stringify(files)}) fs.writeFileSync(output + '/' + file.path, ${JSON.stringify(bytes.toString())});
   if (defect === 'extra-file') fs.writeFileSync(output + '/extra.js', 'unexpected');
   if (defect === 'missing-file') fs.unlinkSync(output + '/index.html');
   if (defect === 'symlink') { fs.unlinkSync(output + '/index.html'); fs.symlinkSync('../calls.jsonl', output + '/index.html'); }
@@ -91,7 +95,7 @@ if (command === 'export-browser') {
     schema: 'prismpm/browser-export/1', reference: selected.reference,
     release_digest: selected.reference.split('@')[1], output,
     model_digest: selected.model_digest, build_digest: selected.build_digest, tree_digest: selected.tree_digest,
-    files: [{path: 'index.html', size: ${bytes.length}, digest: ${JSON.stringify(fileDigest)}}]
+    files: ${JSON.stringify(files)}
   };
   if (defect === 'wrong-model') result.model_digest = 'sha256:' + '0'.repeat(64);
   if (defect === 'wrong-build') result.build_digest = 'sha256:' + '0'.repeat(64);
@@ -100,6 +104,8 @@ if (command === 'export-browser') {
   if (defect === 'wrong-digest') result.files[0].digest = 'sha256:' + '0'.repeat(64);
   if (defect === 'duplicate-file') result.files.push(result.files[0]);
   if (defect === 'traversal') result.files[0].path = '../calls.jsonl';
+  if (defect === 'extra-acceptance') result.accepted = true;
+  if (defect === 'extra-file-property') result.files[0].verified = true;
 }
 process.stdout.write(defect === 'invalid-json' ? 'not a receipt' : JSON.stringify(result));
 `, { mode: 0o755 });
@@ -107,7 +113,8 @@ process.stdout.write(defect === 'invalid-json' ? 'not a receipt' : JSON.stringif
 }
 for (const defect of ['lock-failure', 'pull-failure', 'verify-release-failure', 'export-browser-failure',
   'invalid-json', 'unverified', 'candidate', 'wrong-policy', 'wrong-release', 'wrong-model', 'wrong-build', 'wrong-tree',
-  'extra-file', 'missing-file', 'symlink', 'root-symlink', 'hardlink', 'wrong-size', 'wrong-digest', 'duplicate-file', 'traversal']) {
+  'extra-file', 'missing-file', 'symlink', 'root-symlink', 'hardlink', 'wrong-size', 'wrong-digest', 'duplicate-file', 'traversal',
+  'extra-acceptance', 'extra-file-property']) {
   test(`actual exporter rejects ${defect} at its SDK process boundary`, t => {
     const { root, env } = sdkBoundary(t, defect);
     const result = run(root, 'site', env);

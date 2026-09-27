@@ -53,7 +53,7 @@ from synthetic metadata, ignoring it, or removing its obligation is prohibited.
 On the correction branch, the complete locked-devcontainer `just vv` passes
 template/SDK checks, model validation, formatting and warnings-denied Clippy,
 then fails DC-01 because production acceptance is false. The publication unit
-suite passes 10/10 Rust cases and 26/26 actual-wrapper process regressions.
+suite passes 10/10 Rust cases. Both actual-wrapper suites now pass 60 cases.
 Pinned actionlint accepts all workflows. These results do not close DC-01.
 
 Independent review identified output-root symlink substitution and a main-ref
@@ -61,3 +61,28 @@ advance during export. A planted root-symlink process double first made the
 wrapper accept the substituted directory; the explicit directory check rejects
 it. Deployment rechecks current main immediately before the privileged action.
 These guards do not claim an atomic transaction with GitHub branch updates.
+
+The live-byte wrapper invokes the existing SDK `verify-browser-publication`
+contract, not an HTTP-200 or caller-receipt substitute. It independently pulls
+and replays the selected release, then binds observed model/build/tree/target
+and the complete file inventory. The first 24 process-boundary cases failed
+with the wrapper absent. Independent review then exposed six accepted
+substitutions: valid-looking changed file digests/sizes and extra acceptance or
+file fields. Those planted defects fail the repaired guard. The complete 32 live
+and 28 export cases pass, using the SDK's actual six-file profile, closed
+receipt shape and canonical inventory digest. Doubles establish orchestration
+only. The immutable SDK update,
+real producer and full live journeys remain required.
+
+Pages currently reports HTTPS enforcement disabled. Direct HTTP observation
+returned 200 without redirect. An enforcement request failed with GitHub's
+`The certificate does not exist yet` response; no setting or DNS was changed.
+The negative deployed audit now records actual HTTP upgrade behavior, not the
+static `pages_state.toml` TLS claims.
+
+The repeated three-engine audit records 21 failures with HTTP enforcement
+included. CI uses the SDK-selected artifact inventory; the unbound manual
+diagnostic retains the legacy deployment inventory only. Neither mode signs
+acceptance. Publication containers run as the checkout owner; the CI checkout
+is made non-group/world-writable to satisfy the SDK export filesystem contract.
+The locked SDK lock check and all 60 wrapper cases also pass as a non-root user.
