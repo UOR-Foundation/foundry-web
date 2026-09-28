@@ -2,6 +2,19 @@
 
 Not production-accepted. No replacement application was deployed.
 
+## Bounded live-asset observation
+
+LA-01 now streams selected assets within their exact SDK size; the unselected
+negative audit retains the 64-MiB ceiling. Real HTTP tests cover the complete
+maximum, excess/truncated bodies, gzip expansion, redirects, timeout and socket
+cleanup. The new behavior test first failed before implementation; three actual
+source mutants then failed the bound, EOF and hashing checks.
+
+The locked SDK passed all 218 publication tests, normal model write/readback,
+template/lock checks, formatting and Clippy. Complete `just vv` still fails the
+unchanged DC-01 `production_deployment_accepted` assertion. These transport
+checks are diagnostic infrastructure, not application or deployment acceptance.
+
 ## Corrected boundaries
 
 - PS-01/PP-01 policy no longer supplies invented asset digests, producer commit,

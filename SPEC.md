@@ -122,6 +122,10 @@ TLS handshake; desired model settings are not deployment evidence. Artifact
 identities and inventories come from the selected SDK-verified release, never
 invented model constants. Metadata/transport observations and SDK byte-integrity
 receipts remain distinct from complete application acceptance.
+The diagnostic asset observer streams through the selected SDK file-size bound
+(64 MiB for an unselected negative audit), refuses excess or incomplete bodies,
+hashes complete captured bytes through EOF, and cancels failed or timed-out
+requests. Response length headers do not substitute for observed body bytes.
 Resolve the deployment's referenced publisher job through the Actions API and
 bind its source, run, attempt and successful conclusion. Recheck mutable
 deployment metadata at capture completion and repeat observation after live

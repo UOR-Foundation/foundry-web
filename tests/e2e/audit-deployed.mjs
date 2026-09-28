@@ -1,12 +1,12 @@
 // Independent, non-acceptance audit. A passing result is not product signoff.
 // Uses only public assets and an isolated browser; never authenticates a user,
 // creates an organization, submits a payment, or sends mail to a real mailbox.
-import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { chromium, firefox, webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { regular, selectedProducer, bindBrowserReceipt } from '../../scripts/publication-sdk.mjs';
+import { captureLiveAsset } from '../../scripts/live-assets.mjs';
 
 if (process.argv.length > 3) throw new Error('Expected one URL or --selected');
 const selected = process.argv[2] === '--selected' ? selectedProducer() : null;
@@ -45,14 +45,11 @@ const paths = integrity ? integrity.files.map(file => file.path)
   : ['index.html', 'foundry.js', 'foundry.css', 'foundry_bg.wasm', 'holo_runtime.holo', 'manifest.json'];
 for (const path of paths) {
   try {
-    const response = await fetch(new URL(path, target), { redirect: 'error', signal: AbortSignal.timeout(30000) });
-    const bytes = Buffer.from(await response.arrayBuffer());
-    const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
-    report.assets.push({ path, status: response.status, size: bytes.length,
-      digest,
-      content_type: response.headers.get('content-type') });
-    if (!response.ok) failure('assets', `${path}: HTTP ${response.status}`);
     const expected = integrity?.files.find(file => file.path === path);
+    const { bytes, digest, status, contentType } = await captureLiveAsset(new URL(path, target),
+      { expectedSize: expected?.size ?? null });
+    report.assets.push({ path, status, size: bytes.length, digest, content_type: contentType });
+    if (status < 200 || status > 299) failure('assets', `${path}: HTTP ${status}`);
     if (expected && (bytes.length !== expected.size || digest !== expected.digest)) {
       failure('assets', `${path}: bytes differ from the independently verified release observation`);
     }
