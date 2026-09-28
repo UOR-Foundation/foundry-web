@@ -1,10 +1,59 @@
-# Publication verification
+# Publication verification — 28 September 2026
+
+Not production-accepted. No replacement application was deployed.
+
+## Corrected boundaries
+
+- PS-01/PP-01 policy no longer supplies invented asset digests, producer commit,
+  certificate authority or HSTS observations. Closed schemas reject those fields.
+- Selection rejects unknown authority fields and non-string release references.
+- Pages observations bind the Action URL, publisher SHA, run/attempt, latest
+  deployment/status and independently fetched successful publisher job.
+- Real HTTP/TLS capture, end-of-capture metadata rechecks and post-audit
+  reobservation remain separate from SDK byte integrity and product acceptance.
+- Parsed YAML verification binds the complete reviewed workflow graph; skipped
+  checks, changed privileges, substituted outputs and extra commands fail.
+
+## Falsification and verification
+
+Inside the locked SDK devcontainer:
+
+| Check | Result |
+| --- | --- |
+| Selection mutants before correction | Five invalid selections incorrectly passed; all rejected after correction |
+| Publisher-job mutants before correction | Ten missing/substituted jobs incorrectly passed; all rejected after correction |
+| Pages/pipeline fabricated-evidence tests | Failed before correction; closed policy tests pass |
+| `npm test` | 210 passed, zero skipped |
+| Model and PS-01/PP-01 Rust slices | Nine model tests and six integration tests passed |
+| Model regeneration/readback, formatting, Clippy | Passed |
+| Complete `just vv` | Failed at DC-01: `production_deployment_accepted` is false |
+
+Process doubles exercise refusal/wiring only; they are not production evidence.
+The workflow oracle includes 49 independently changed source mutations plus
+duplicate-key, alias and multi-document rejection. Independent adversarial
+review required actual job lookup, partial-failure retention, complete workflow
+wiring and final freshness checks; those corrections are included.
+
+## Live observations
+
+At `2026-09-28T04:22:50Z`, the default Pages endpoint returned HTTPS 200 with an
+authenticated TLS 1.3 connection, but HTTP also returned 200 without a redirect.
+The Pages API reported `https_enforced: false`. Enabling enforcement returned
+404, `The certificate does not exist yet`; no domain configuration was changed.
+The observer rejected this state. The live publisher remains
+`6e86c87c74b441a3f530e1cde9354d11417f6000`.
+
+`model/publication.json` selects no accepted producer release. Complete modeled
+core/SDK verification, an authorized immutable producer release, correct Pages
+transport, independent live journeys and final acceptance remain required.
+
+## 27 September verification record
 
 The 27 September audit does not accept the deployed application. Its Wasm and
 Holo assets are each eight-byte fallbacks. No immutable accepted producer is
 selected in `model/publication.json`. All product obligations in `SPEC.md` remain.
 
-## Reproduced defects
+### Reproduced defects
 
 Inside the locked devcontainer:
 
@@ -23,7 +72,7 @@ Inside the locked devcontainer:
   image does not contain the command. A locally built executable is not a
   substitute for issuing and locking an accepted SDK.
 
-## Required release closure
+### Required release closure
 
 `scripts/export_browser.sh` delegates to the locked SDK. It cannot create an
 application or select a neighboring build. Null selection, existing destination,

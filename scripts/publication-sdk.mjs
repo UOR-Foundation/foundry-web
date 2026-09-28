@@ -24,11 +24,14 @@ export function regular(path) {
 }
 export function selectedProducer() {
   const selection = JSON.parse(regular('model/publication.json'));
-  if (selection.schema !== 'foundry/publication-selection/1'
+  if (!closed(selection, ['schema', 'target', 'release'])
+    || selection.schema !== 'foundry/publication-selection/1'
     || selection.target !== 'https://uor-foundation.github.io/foundry-web/') throw new Error('Unreviewed publication target or schema');
   const release = selection.release;
   if (!release) throw new Error('No accepted immutable producer release is selected; application publication is refused');
-  if (!/^ghcr\.io\/uor-foundation\/uor-foundry@sha256:[0-9a-f]{64}$/.test(release.reference ?? '')
+  if (!closed(release, ['reference', 'policy_digest', 'model_digest', 'build_digest', 'tree_digest'])
+    || typeof release.reference !== 'string'
+    || !/^ghcr\.io\/uor-foundation\/uor-foundry@sha256:[0-9a-f]{64}$/.test(release.reference)
     || !['policy_digest', 'model_digest', 'build_digest', 'tree_digest'].every(key => digest(release[key]))) {
     throw new Error('Producer selection must bind the reviewed repository and exact release, signing policy, model, build, and browser-tree digests');
   }

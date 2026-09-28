@@ -1,5 +1,7 @@
-//! Pages state model and verification engine: verifies accepted GitHub Pages
-//! deployments, Actions artifacts, and HTTPS enforcement.
+//! Desired Pages policy and supplied-value comparisons, not deployed observations.
+//!
+//! Real GitHub, HTTP and TLS observations and SDK-verified artifact identity are
+//! required separately; matching caller-provided values cannot accept a deployment.
 //!
 //! Conformance ID: `PS-01` (suite: `pages-state`).
 
@@ -14,8 +16,6 @@ pub enum PagesStateError {
     DeploymentInactive(String),
     /// HTTPS not enforced or TLS configuration invalid.
     HttpsNotEnforced(String),
-    /// Artifact count or tree digest mismatch.
-    ArtifactMismatch(String),
     /// General validation failure.
     Validation(String),
 }
@@ -26,7 +26,6 @@ impl std::fmt::Display for PagesStateError {
             Self::TargetMismatch(m) => write!(f, "deployment target mismatch: {m}"),
             Self::DeploymentInactive(i) => write!(f, "deployment inactive: {i}"),
             Self::HttpsNotEnforced(h) => write!(f, "https not enforced: {h}"),
-            Self::ArtifactMismatch(a) => write!(f, "artifact mismatch: {a}"),
             Self::Validation(v) => write!(f, "pages state validation error: {v}"),
         }
     }
@@ -36,6 +35,7 @@ impl std::error::Error for PagesStateError {}
 
 /// Policy configuration for Pages state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PagesStatePolicyConfig {
     /// Require an active deployment on GitHub Pages.
     pub require_active_deployment: bool,
@@ -51,6 +51,7 @@ pub struct PagesStatePolicyConfig {
 
 /// Deployment target configuration for GitHub Pages.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DeploymentTargetConfig {
     /// Expected origin URL.
     pub origin: String,
@@ -68,34 +69,29 @@ pub struct DeploymentTargetConfig {
     pub min_deployment_count: u32,
 }
 
-/// HTTPS enforcement and TLS parameters.
+/// Desired HTTPS enforcement and TLS parameters, not observations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct HttpsEnforcementConfig {
-    /// Whether HTTPS enforcement is active.
+    /// Whether HTTPS enforcement is required.
     pub enforced: bool,
-    /// Expected minimum TLS version.
+    /// Required observed TLS version.
     pub tls_version: String,
-    /// Expected HSTS header policy.
-    pub hsts_header: String,
-    /// Certificate authority or provisioning source.
-    pub certificate_authority: String,
 }
 
 /// Artifact verification details for the deployment.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ArtifactVerificationConfig {
     /// Expected artifact name.
     pub expected_artifact_name: String,
     /// Expected asset count in the artifact.
     pub expected_asset_count: usize,
-    /// Expected reproducible tree digest.
-    pub expected_tree_digest: String,
-    /// Producer release commit hash.
-    pub producer_commit: String,
 }
 
 /// Top-level Pages state model.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PagesStateConfig {
     /// Schema spec identifier.
     pub spec: String,
@@ -112,7 +108,7 @@ pub struct PagesStateConfig {
 }
 
 impl PagesStateConfig {
-    /// Validate self-consistency of the Pages state model.
+    /// Validate desired policy. This does not observe or accept a deployment.
     pub fn check(&self) -> Result<(), crate::ModelError> {
         if self.spec != "foundry/pages-state/1" {
             return Err(crate::ModelError::Inconsistent(format!(
@@ -128,9 +124,16 @@ impl PagesStateConfig {
             )));
         }
 
-        if !self.deployment_target.url.starts_with("https://") {
+        if self.deployment_target.origin != "https://uor-foundation.github.io"
+            || self.deployment_target.subpath != "/foundry-web/"
+            || self.deployment_target.url
+                != format!(
+                    "{}{}",
+                    self.deployment_target.origin, self.deployment_target.subpath
+                )
+        {
             return Err(crate::ModelError::Inconsistent(
-                "deployment target URL must use https".to_string(),
+                "deployment target must match the authorized HTTPS origin and subpath".to_string(),
             ));
         }
 
@@ -152,38 +155,47 @@ impl PagesStateConfig {
             ));
         }
 
-        if !self.https_enforcement.enforced && self.policy.require_https_enforcement {
-            return Err(crate::ModelError::Inconsistent(
-                "policy requires https_enforcement to be enabled".to_string(),
-            ));
-        }
-
-        if self.artifact_verification.expected_asset_count != 6 {
-            return Err(crate::ModelError::Inconsistent(format!(
-                "expected asset count must be 6, got {}",
-                self.artifact_verification.expected_asset_count
-            )));
-        }
-
-        if !self
-            .artifact_verification
-            .expected_tree_digest
-            .starts_with("sha256:")
+        if !self.policy.require_active_deployment
+            || !self.policy.require_https_enforcement
+            || !self.policy.require_pages_artifact_verification
+            || !self.policy.prohibit_unverified_pages_origin
+            || !self.policy.prohibit_stale_deployments
         {
             return Err(crate::ModelError::Inconsistent(
-                "expected tree digest must be sha256 prefixed".to_string(),
+                "all Pages policy requirements must remain enabled".to_string(),
             ));
+        }
+
+        if !self.https_enforcement.enforced || self.https_enforcement.tls_version != "TLSv1.3" {
+            return Err(crate::ModelError::Inconsistent(
+                "policy requires enforced HTTPS with TLSv1.3".to_string(),
+            ));
+        }
+
+        if self.deployment_target.min_deployment_count != 1 {
+            return Err(crate::ModelError::Inconsistent(
+                "policy requires the latest successful Pages deployment".to_string(),
+            ));
+        }
+
+        if self.artifact_verification.expected_artifact_name != "github-pages"
+            || self.artifact_verification.expected_asset_count != 6
+        {
+            return Err(crate::ModelError::Inconsistent(format!(
+                "expected github-pages artifact must contain 6 assets, got {}",
+                self.artifact_verification.expected_asset_count
+            )));
         }
 
         Ok(())
     }
 }
 
-/// Verification engine for Pages deployment state.
+/// Policy comparisons for supplied values. Success is not deployment evidence.
 pub struct PagesStateEngine;
 
 impl PagesStateEngine {
-    /// Verify deployment target and actual Pages configuration.
+    /// Compare supplied target values with policy; no GitHub state is queried.
     pub fn verify_deployment_target(
         config: &PagesStateConfig,
         actual_url: &str,
@@ -232,7 +244,7 @@ impl PagesStateEngine {
         Ok(())
     }
 
-    /// Verify HTTPS enforcement state and TLS parameters.
+    /// Compare supplied HTTPS values with policy; no connection is observed.
     pub fn verify_https_enforcement(
         config: &PagesStateConfig,
         is_https_enforced: bool,
@@ -254,43 +266,100 @@ impl PagesStateEngine {
 
         Ok(())
     }
+}
 
-    /// Verify deployment artifact name, asset count, tree digest, and producer commit.
-    pub fn verify_artifact_state(
-        config: &PagesStateConfig,
-        artifact_name: &str,
-        asset_count: usize,
-        tree_digest: &str,
-        producer_commit: &str,
-    ) -> Result<(), PagesStateError> {
-        if artifact_name != config.artifact_verification.expected_artifact_name {
-            return Err(PagesStateError::ArtifactMismatch(format!(
-                "artifact name '{artifact_name}' does not match expected '{}'",
-                config.artifact_verification.expected_artifact_name
-            )));
+#[cfg(test)]
+mod tests {
+    use super::PagesStateConfig;
+
+    #[test]
+    fn pages_configuration_does_not_claim_observed_evidence_ps_01() {
+        let source = std::fs::read_to_string(crate::repo_root().join("model/pages_state.toml"))
+            .expect("read Pages policy");
+        let value: toml::Value = toml::from_str(&source).expect("parse Pages policy");
+        for (section, key) in [
+            ("https_enforcement", "hsts_header"),
+            ("https_enforcement", "certificate_authority"),
+            ("artifact_verification", "expected_tree_digest"),
+            ("artifact_verification", "producer_commit"),
+        ] {
+            assert!(
+                value[section].get(key).is_none(),
+                "policy must not assert {key}"
+            );
+            let mut forged = value.clone();
+            forged[section]
+                .as_table_mut()
+                .expect("policy section")
+                .insert(
+                    key.into(),
+                    toml::Value::String("invented-observation".into()),
+                );
+            let result = toml::from_str::<PagesStateConfig>(
+                &toml::to_string(&forged).expect("serialize injected evidence"),
+            );
+            assert!(result.is_err(), "policy must reject injected {key}");
         }
+    }
 
-        if asset_count != config.artifact_verification.expected_asset_count {
-            return Err(PagesStateError::ArtifactMismatch(format!(
-                "asset count {} does not match expected {}",
-                asset_count, config.artifact_verification.expected_asset_count
-            )));
+    #[test]
+    fn pages_policy_cannot_disable_required_constraints() {
+        let source = std::fs::read_to_string(crate::repo_root().join("model/pages_state.toml"))
+            .expect("read Pages policy");
+        let value: toml::Value = toml::from_str(&source).expect("parse Pages policy");
+        for key in value["policy"].as_table().expect("policy flags").keys() {
+            let mut weakened = value.clone();
+            weakened["policy"][key] = toml::Value::Boolean(false);
+            let config: PagesStateConfig =
+                toml::from_str(&toml::to_string(&weakened).expect("serialize weakened policy"))
+                    .expect("parse weakened policy");
+            assert!(config.check().is_err(), "disabled {key} must fail");
         }
+    }
 
-        if tree_digest != config.artifact_verification.expected_tree_digest {
-            return Err(PagesStateError::ArtifactMismatch(format!(
-                "tree digest '{tree_digest}' does not match expected '{}'",
-                config.artifact_verification.expected_tree_digest
-            )));
+    #[test]
+    fn pages_policy_refuses_target_and_transport_substitution() {
+        let config = crate::Model::load_from_repo_root()
+            .expect("model loads")
+            .pages_state;
+        for count in [0, 2] {
+            let mut weakened = config.clone();
+            weakened.deployment_target.min_deployment_count = count;
+            assert!(weakened.check().is_err());
         }
-
-        if producer_commit != config.artifact_verification.producer_commit {
-            return Err(PagesStateError::ArtifactMismatch(format!(
-                "producer commit '{producer_commit}' does not match expected '{}'",
-                config.artifact_verification.producer_commit
-            )));
+        for field in [
+            "origin",
+            "subpath",
+            "url",
+            "environment",
+            "branch",
+            "build_type",
+        ] {
+            let mut weakened = config.clone();
+            let target = &mut weakened.deployment_target;
+            let value = match field {
+                "origin" => &mut target.origin,
+                "subpath" => &mut target.subpath,
+                "url" => &mut target.url,
+                "environment" => &mut target.environment,
+                "branch" => &mut target.branch,
+                "build_type" => &mut target.build_type,
+                _ => unreachable!(),
+            };
+            *value = "substituted".into();
+            assert!(weakened.check().is_err(), "substituted {field} must fail");
         }
-
-        Ok(())
+        let mut weakened = config.clone();
+        weakened.https_enforcement.enforced = false;
+        assert!(weakened.check().is_err());
+        let mut weakened = config.clone();
+        weakened.https_enforcement.tls_version = "TLSv1.2".into();
+        assert!(weakened.check().is_err());
+        let mut weakened = config.clone();
+        weakened.artifact_verification.expected_asset_count = 0;
+        assert!(weakened.check().is_err());
+        let mut weakened = config;
+        weakened.artifact_verification.expected_artifact_name = "other".into();
+        assert!(weakened.check().is_err());
     }
 }

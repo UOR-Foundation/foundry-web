@@ -76,6 +76,8 @@ jobs:
     needs: export
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      page-url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: read
       pages: write
@@ -102,12 +104,30 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      pages: read
+      deployments: read
+      actions: read
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: ${{ needs.export.outputs.revision }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Observe the exact Pages deployment and enforced HTTPS target
+        env:
+          SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_SHA: ${{ needs.export.outputs.revision }}
+          PAGES_DEPLOYED_URL: ${{ needs.publish.outputs.page-url }}
+        run: |
+          set -euo pipefail
+          chmod go-w "$PWD"
+          docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
+            --env GH_TOKEN --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
+            --env PUBLISH_SHA --env PAGES_DEPLOYED_URL \
+            --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
+            --entrypoint node "$SDK_IMAGE" scripts/observe-pages.mjs
       - name: Replay exact live byte integrity through the locked SDK
         env:
           SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
@@ -128,6 +148,22 @@ jobs:
             --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
             --entrypoint bash "$SDK_IMAGE" -c \
             'npm ci --cache /tmp/foundry-publisher-npm --ignore-scripts --no-audit --no-fund && npm run audit:deployed -- --selected'
+      - name: Reobserve current deployment after all live audits
+        env:
+          SDK_IMAGE: ${{ needs.export.outputs.sdk-image }}
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_SHA: ${{ needs.export.outputs.revision }}
+          PAGES_DEPLOYED_URL: ${{ needs.publish.outputs.page-url }}
+          PAGES_OBSERVATION_PHASE: final
+        run: |
+          set -euo pipefail
+          chmod go-w "$PWD"
+          docker run --rm --init --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
+            --env GH_TOKEN --env GITHUB_REPOSITORY --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT \
+            --env PUBLISH_SHA --env PAGES_DEPLOYED_URL --env PAGES_OBSERVATION_PHASE \
+            --mount "type=bind,source=$PWD,target=/workspace" --workdir /workspace \
+            --entrypoint node "$SDK_IMAGE" scripts/observe-pages.mjs
       - name: Retain observations and negative-audit diagnostics
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

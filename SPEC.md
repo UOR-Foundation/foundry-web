@@ -115,6 +115,18 @@ Upload only the verified, authorized artifact closure. Deploy it without a
 second build, under the authorized environment and credentials. Bind the
 deployment result to the exact publisher revision and producer release.
 
+Pages observations use the deployment Action's actual URL, exact workflow run
+and attempt, current main revision, and latest successful deployment/status.
+Observe the Pages API configuration, HTTP-to-HTTPS redirect and authenticated
+TLS handshake; desired model settings are not deployment evidence. Artifact
+identities and inventories come from the selected SDK-verified release, never
+invented model constants. Metadata/transport observations and SDK byte-integrity
+receipts remain distinct from complete application acceptance.
+Resolve the deployment's referenced publisher job through the Actions API and
+bind its source, run, attempt and successful conclusion. Recheck mutable
+deployment metadata at capture completion and repeat observation after live
+audits; retain initial and final observations separately.
+
 Verify the actual HTTPS URL, redirect destinations, complete asset bytes,
 and all five core capabilities' independent-user journeys after deployment,
 including normal account and organization creation from empty product state,

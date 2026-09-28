@@ -1,5 +1,4 @@
-# model/pages_state.toml --- GitHub Pages deployment state,
-# verified artifacts, and HTTPS enforcement.
+# Desired GitHub Pages policy, not observed deployment evidence.
 #
 # Conformance ID: PS-01 (suite: pages-state)
 
@@ -25,11 +24,7 @@ min_deployment_count = 1
 [https_enforcement]
 enforced = true
 tls_version = "TLSv1.3"
-hsts_header = "max-age=31536000; includeSubDomains; preload"
-certificate_authority = "DigiCert / GitHub Pages"
 
 [artifact_verification]
 expected_artifact_name = "github-pages"
 expected_asset_count = 6
-expected_tree_digest = "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194"
-producer_commit = "df50044df62eb0ef7ffebec2804561a9d16b5fc7"
