@@ -11,3 +11,10 @@ Feature: Pages state and HTTPS enforcement
     And the deployment count is non-zero with verified six-file artifact tree closure
     And HTTPS enforcement and TLS parameters match approved policy
     And arbitrary or stale deployment origins are rejected
+
+  @PS-01 @build
+  Scenario: Configuration cannot impersonate deployment observations
+    Given a Pages policy without asserted certificate, deployment or artifact observations
+    When a configuration supplies a certificate authority, HSTS observation, artifact digest or producer commit
+    Then the policy parser rejects the unrecognized evidence fields
+    And policy comparison and process doubles do not establish deployed application acceptance

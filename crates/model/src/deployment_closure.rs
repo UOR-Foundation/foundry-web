@@ -110,9 +110,15 @@ impl DeploymentClosureConfig {
             )));
         }
 
-        if self.closure_evidence.closure_verdict != "ACCEPTED_AND_CLOSED" {
+        // Configuration validity is not release acceptance. An unaccepted
+        // deployment is a valid observable state, not permission to fabricate
+        // a successful verdict just to make the registry parse.
+        if !matches!(
+            self.closure_evidence.closure_verdict.as_str(),
+            "ACCEPTED_AND_CLOSED" | "NOT_ACCEPTED"
+        ) {
             return Err(crate::ModelError::Inconsistent(format!(
-                "closure verdict must be 'ACCEPTED_AND_CLOSED', got '{}'",
+                "unrecognized closure verdict '{}'",
                 self.closure_evidence.closure_verdict
             )));
         }

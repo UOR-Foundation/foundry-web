@@ -200,3 +200,16 @@ fn rollback_triggers_on_journey_failure() {
     assert!(msg.contains("ROLLBACK_TRIGGERED"));
     assert!(msg.contains(&cfg.rollback.previous_known_good_commit));
 }
+/// LA-01 infrastructure regression owner, not application acceptance.
+#[test]
+fn actual_live_integrity_orchestration_rejects_substituted_observations_la_01() {
+    let status = std::process::Command::new("node")
+        .args(["--test", "tests/publication/live-integrity.test.mjs"])
+        .current_dir(repo_model::repo_root())
+        .status()
+        .expect("the locked SDK supplies Node for live observation checks");
+    assert!(
+        status.success(),
+        "live integrity orchestration regressions failed"
+    );
+}

@@ -1,318 +1,177 @@
-//! Publication pipeline model: defines source-free export-browser interfaces,
-//! unchanged six-file browser closure verification, Actions publication workflow
-//! contracts, and prohibition of compilation or arbitrary OCI extraction shortcuts.
+//! Source-free publication policy, not artifact or deployment evidence.
 //!
+//! The locked SDK verifies the selected release and its browser closure. This
+//! module cannot create a second artifact authority from configuration values.
 //! Conformance ID: `PP-01` (suite: `publication-pipeline`).
 
 use serde::{Deserialize, Serialize};
 
-/// Errors arising during publication pipeline operations.
-#[derive(Debug, Clone, PartialEq)]
-pub enum PublicationPipelineError {
-    /// Workflow file definition violates security or pinning requirements.
-    WorkflowDefinitionViolation(String),
-    /// Exported browser asset digest mismatch.
-    AssetDigestMismatch(String),
-    /// Exported browser asset count or path mismatch.
-    AssetCountMismatch(String),
-    /// Artifact tree digest mismatch across exported assets.
-    TreeDigestMismatch(String),
-    /// Prohibited compiler or build shortcut detected in publication path.
-    ProhibitedCompilation(String),
-    /// General validation error.
-    Validation(String),
-}
-
-impl std::fmt::Display for PublicationPipelineError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::WorkflowDefinitionViolation(w) => write!(f, "workflow definition violation: {w}"),
-            Self::AssetDigestMismatch(d) => write!(f, "asset digest mismatch: {d}"),
-            Self::AssetCountMismatch(c) => write!(f, "asset count mismatch: {c}"),
-            Self::TreeDigestMismatch(t) => write!(f, "tree digest mismatch: {t}"),
-            Self::ProhibitedCompilation(p) => write!(f, "prohibited compilation: {p}"),
-            Self::Validation(v) => write!(f, "publication pipeline validation error: {v}"),
-        }
-    }
-}
-
-impl std::error::Error for PublicationPipelineError {}
-
-/// Policy configuration for publication pipeline.
+/// Required source-free publication constraints.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublicationPipelinePolicyConfig {
-    /// Require source-free export from approved SDK path.
+    /// Require source-free export from the approved SDK interface.
     pub require_source_free_export: bool,
-    /// Require publication of unchanged verified assets only.
+    /// Publish unchanged verified assets only.
     pub require_unchanged_asset_publication: bool,
-    /// Require pre-upload byte verification.
+    /// Verify exported bytes before upload.
     pub require_pre_upload_byte_verification: bool,
-    /// Prohibit arbitrary OCI extraction shortcuts.
+    /// Forbid arbitrary OCI extraction shortcuts.
     pub prohibit_arbitrary_oci_extraction: bool,
-    /// Prohibit producer build-workflow reuse shortcuts.
+    /// Forbid reusing the producer's build workflow.
     pub prohibit_producer_build_workflow_reuse: bool,
-    /// Prohibit compilation in the publication pipeline.
+    /// Forbid application compilation in the publisher.
     pub prohibit_compilation_in_pipeline: bool,
 }
 
-/// Pipeline workflow configuration.
+/// Authorized workflow structure, without claimed artifact measurements.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PipelineWorkflowConfig {
-    /// Path to GitHub Actions publication workflow.
+    /// Publication workflow path.
     pub workflow_path: String,
-    /// Authorized environment name.
+    /// Authorized environment.
     pub environment: String,
-    /// Target release branch.
+    /// Authorized release branch.
     pub target_branch: String,
-    /// Export output directory name.
+    /// Source-free export destination.
     pub export_directory: String,
-    /// Number of assets in the browser profile.
+    /// Number of assets required by the SDK browser profile.
     pub artifact_count: usize,
-    /// Expected tree digest over the six-file profile.
-    pub expected_tree_digest: String,
 }
 
-/// Pipeline asset record describing an expected browser distribution artifact.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct PipelineAssetRecord {
-    /// Asset path relative to export directory.
-    pub path: String,
-    /// MIME content type.
-    pub mime_type: String,
-    /// Asset size in bytes.
-    pub size_bytes: u64,
-    /// SHA-256 content digest with `sha256:` prefix.
-    pub sha256: String,
-}
-
-/// Top-level publication pipeline configuration loaded from `model/publication_pipeline.toml`.
+/// Publication policy loaded from `model/publication_pipeline.toml`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PublicationPipelineConfig {
-    /// Spec identifier (`foundry/publication-pipeline/1`).
+    /// Policy schema identifier.
     pub spec: String,
-    /// Release stage (`staged-core`).
+    /// Required release stage.
     pub stage: String,
-    /// Policy configuration.
+    /// Mandatory publication constraints.
     pub policy: PublicationPipelinePolicyConfig,
-    /// Pipeline workflow configuration.
+    /// Authorized workflow structure.
     pub pipeline: PipelineWorkflowConfig,
-    /// List of expected assets.
-    pub expected_assets: Vec<PipelineAssetRecord>,
 }
 
 impl PublicationPipelineConfig {
-    /// Validate configuration invariants.
+    /// Check desired policy consistency. This does not inspect or accept a release.
     pub fn check(&self) -> Result<(), crate::ModelError> {
-        let bad = |m: String| crate::ModelError::Inconsistent(m);
-
-        if self.spec != "foundry/publication-pipeline/1" {
-            return Err(bad(format!(
-                "publication_pipeline spec must be 'foundry/publication-pipeline/1', found '{}'",
-                self.spec
-            )));
+        let bad = |message: &str| crate::ModelError::Inconsistent(message.into());
+        if self.spec != "foundry/publication-pipeline/1" || self.stage != "staged-core" {
+            return Err(bad("invalid publication policy schema or stage"));
         }
-
-        if self.stage != "staged-core" {
-            return Err(bad(format!(
-                "publication_pipeline stage must be 'staged-core', found '{}'",
-                self.stage
-            )));
-        }
-
-        if !self.policy.require_source_free_export {
+        if !self.policy.require_source_free_export
+            || !self.policy.require_unchanged_asset_publication
+            || !self.policy.require_pre_upload_byte_verification
+            || !self.policy.prohibit_arbitrary_oci_extraction
+            || !self.policy.prohibit_producer_build_workflow_reuse
+            || !self.policy.prohibit_compilation_in_pipeline
+        {
             return Err(bad(
-                "policy.require_source_free_export must be true".to_string()
+                "all source-free publication constraints must remain enabled",
             ));
         }
-
-        if !self.policy.require_unchanged_asset_publication {
+        if self.pipeline.workflow_path != ".github/workflows/pages.yml"
+            || self.pipeline.environment != "github-pages"
+            || self.pipeline.target_branch != "main"
+            || self.pipeline.export_directory != "site"
+            || self.pipeline.artifact_count != 6
+        {
             return Err(bad(
-                "policy.require_unchanged_asset_publication must be true".to_string(),
+                "publication workflow must match the authorized source-free target",
             ));
         }
-
-        if !self.policy.require_pre_upload_byte_verification {
-            return Err(bad(
-                "policy.require_pre_upload_byte_verification must be true".to_string(),
-            ));
-        }
-
-        if !self.policy.prohibit_compilation_in_pipeline {
-            return Err(bad(
-                "policy.prohibit_compilation_in_pipeline must be true".to_string()
-            ));
-        }
-
-        if self.expected_assets.len() != self.pipeline.artifact_count {
-            return Err(bad(format!(
-                "expected_assets length ({}) must match pipeline.artifact_count ({})",
-                self.expected_assets.len(),
-                self.pipeline.artifact_count
-            )));
-        }
-
-        for asset in &self.expected_assets {
-            if !asset.sha256.starts_with("sha256:") {
-                return Err(bad(format!(
-                    "asset '{}' sha256 must start with sha256:",
-                    asset.path
-                )));
-            }
-            if asset.size_bytes == 0 {
-                return Err(bad(format!(
-                    "asset '{}' size_bytes must be positive",
-                    asset.path
-                )));
-            }
-        }
-
         Ok(())
     }
 }
 
-/// Engine executing publication pipeline verification.
-pub struct PublicationPipelineEngine;
+#[cfg(test)]
+mod tests {
+    use super::PublicationPipelineConfig;
 
-impl PublicationPipelineEngine {
-    /// Verify workflow content against pipeline requirements.
-    pub fn verify_workflow_definition(
-        config: &PublicationPipelineConfig,
-        workflow_content: &str,
-    ) -> Result<(), PublicationPipelineError> {
-        // Must contain environment
-        if !workflow_content.contains(&format!("name: {}", config.pipeline.environment))
-            && !workflow_content.contains(&format!("environment: {}", config.pipeline.environment))
-        {
-            return Err(PublicationPipelineError::WorkflowDefinitionViolation(
-                format!(
-                    "workflow does not specify authorized environment '{}'",
-                    config.pipeline.environment
-                ),
-            ));
-        }
-
-        // Must run on main branch
-        if !workflow_content.contains(&format!("branches: [{}]", config.pipeline.target_branch))
-            && !workflow_content.contains(&format!("- {}", config.pipeline.target_branch))
-        {
-            return Err(PublicationPipelineError::WorkflowDefinitionViolation(
-                format!(
-                    "workflow does not specify target branch '{}'",
-                    config.pipeline.target_branch
-                ),
-            ));
-        }
-
-        // Must prohibit compilation commands
-        let prohibited_commands = [
-            "cargo build",
-            "cargo run",
-            "rustc ",
-            "wasm-pack build",
-            "npm run build",
-        ];
-        for cmd in prohibited_commands {
-            if workflow_content.contains(cmd) {
-                return Err(PublicationPipelineError::ProhibitedCompilation(format!(
-                    "workflow contains prohibited compilation command '{cmd}': source-free export required"
-                )));
-            }
-        }
-
-        // Must contain checkout with fetch-depth 0 and persist-credentials false
-        if !workflow_content.contains("fetch-depth: 0")
-            || !workflow_content.contains("persist-credentials: false")
-        {
-            return Err(PublicationPipelineError::WorkflowDefinitionViolation(
-                "workflow checkout must specify fetch-depth: 0 and persist-credentials: false"
-                    .to_string(),
-            ));
-        }
-
-        // Must contain pages upload and deploy steps
-        if !workflow_content.contains("actions/upload-pages-artifact@")
-            || !workflow_content.contains("actions/deploy-pages@")
-        {
-            return Err(PublicationPipelineError::WorkflowDefinitionViolation(
-                "workflow must use pinned upload-pages-artifact and deploy-pages actions"
-                    .to_string(),
-            ));
-        }
-
-        Ok(())
+    fn policy() -> toml::Value {
+        let source =
+            std::fs::read_to_string(crate::repo_root().join("model/publication_pipeline.toml"))
+                .expect("read publication policy");
+        toml::from_str(&source).expect("parse publication policy")
     }
 
-    /// Verify exported browser asset closure against expected records and tree digest.
-    pub fn verify_exported_closure(
-        config: &PublicationPipelineConfig,
-        assets: &[PipelineAssetRecord],
-        actual_tree_digest: &str,
-    ) -> Result<(), PublicationPipelineError> {
-        if actual_tree_digest != config.pipeline.expected_tree_digest {
-            return Err(PublicationPipelineError::TreeDigestMismatch(format!(
-                "tree digest '{}' does not match expected '{}'",
-                actual_tree_digest, config.pipeline.expected_tree_digest
-            )));
-        }
-
-        if assets.len() != config.expected_assets.len() {
-            return Err(PublicationPipelineError::AssetCountMismatch(format!(
-                "exported asset count mismatch: expected {}, got {}",
-                config.expected_assets.len(),
-                assets.len()
-            )));
-        }
-
-        for expected in &config.expected_assets {
-            let found = assets
-                .iter()
-                .find(|a| a.path == expected.path)
-                .ok_or_else(|| {
-                    PublicationPipelineError::AssetCountMismatch(format!(
-                        "missing expected asset '{}'",
-                        expected.path
-                    ))
-                })?;
-
-            if found.sha256 != expected.sha256 {
-                return Err(PublicationPipelineError::AssetDigestMismatch(format!(
-                    "asset '{}' sha256 mismatch: expected '{}', got '{}'",
-                    expected.path, expected.sha256, found.sha256
-                )));
+    #[test]
+    fn pipeline_configuration_does_not_claim_artifact_evidence_pp_01() {
+        let value = policy();
+        assert!(
+            value.get("expected_assets").is_none(),
+            "fixture assets are not release authority"
+        );
+        assert!(
+            value["pipeline"].get("expected_tree_digest").is_none(),
+            "fixture tree is not release authority"
+        );
+        for at_root in [false, true] {
+            let mut forged = value.clone();
+            if at_root {
+                forged
+                    .as_table_mut()
+                    .expect("policy table")
+                    .insert("expected_assets".into(), toml::Value::Array(vec![]));
+            } else {
+                forged["pipeline"]
+                    .as_table_mut()
+                    .expect("pipeline table")
+                    .insert(
+                        "expected_tree_digest".into(),
+                        toml::Value::String("invented-tree".into()),
+                    );
             }
-
-            if found.size_bytes != expected.size_bytes {
-                return Err(PublicationPipelineError::AssetDigestMismatch(format!(
-                    "asset '{}' size mismatch: expected {}, got {}",
-                    expected.path, expected.size_bytes, found.size_bytes
-                )));
-            }
-
-            if found.mime_type != expected.mime_type {
-                return Err(PublicationPipelineError::Validation(format!(
-                    "asset '{}' mime_type mismatch: expected '{}', got '{}'",
-                    expected.path, expected.mime_type, found.mime_type
-                )));
-            }
+            let result = toml::from_str::<PublicationPipelineConfig>(
+                &toml::to_string(&forged).expect("serialize injected evidence"),
+            );
+            assert!(
+                result.is_err(),
+                "policy must reject injected artifact authority"
+            );
         }
-
-        Ok(())
     }
 
-    /// Verify that export operation was source-free without build tool invocation.
-    pub fn verify_source_free_export(
-        _config: &PublicationPipelineConfig,
-        export_script: &str,
-    ) -> Result<(), PublicationPipelineError> {
-        if export_script.contains("cargo build")
-            || export_script.contains("cargo check")
-            || export_script.contains("rustc")
-        {
-            return Err(PublicationPipelineError::ProhibitedCompilation(
-                "export script invoked Rust compiler instead of source-free export".to_string(),
-            ));
+    #[test]
+    fn publication_policy_cannot_disable_required_constraints() {
+        let value = policy();
+        for key in value["policy"].as_table().expect("policy flags").keys() {
+            let mut weakened = value.clone();
+            weakened["policy"][key] = toml::Value::Boolean(false);
+            let config: PublicationPipelineConfig =
+                toml::from_str(&toml::to_string(&weakened).expect("serialize weakened policy"))
+                    .expect("parse weakened policy");
+            assert!(config.check().is_err(), "disabled {key} must fail");
         }
+    }
 
-        Ok(())
+    #[test]
+    fn publication_policy_refuses_workflow_substitution() {
+        let config = crate::Model::load_from_repo_root()
+            .expect("model loads")
+            .publication_pipeline;
+        for field in [
+            "workflow_path",
+            "environment",
+            "target_branch",
+            "export_directory",
+        ] {
+            let mut weakened = config.clone();
+            let pipeline = &mut weakened.pipeline;
+            let value = match field {
+                "workflow_path" => &mut pipeline.workflow_path,
+                "environment" => &mut pipeline.environment,
+                "target_branch" => &mut pipeline.target_branch,
+                "export_directory" => &mut pipeline.export_directory,
+                _ => unreachable!(),
+            };
+            *value = "substituted".into();
+            assert!(weakened.check().is_err(), "substituted {field} must fail");
+        }
+        let mut weakened = config;
+        weakened.pipeline.artifact_count = 0;
+        assert!(weakened.check().is_err());
     }
 }
