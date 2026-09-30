@@ -5,45 +5,45 @@ use repo_model::{BrowserArtifactRecord, Model, PublisherBindingEngine, Publisher
 fn expected_distribution_assets() -> Vec<BrowserArtifactRecord> {
     vec![
         BrowserArtifactRecord {
+            path: "app.css".to_string(),
+            mime_type: "text/css".to_string(),
+            size_bytes: 804,
+            sha256: "sha256:93a8e4a6a873f55f56a7adb3a55a49912bdcddd740b1af52f9a27f1403ea0279"
+                .to_string(),
+        },
+        BrowserArtifactRecord {
+            path: "app.js".to_string(),
+            mime_type: "application/javascript".to_string(),
+            size_bytes: 3637,
+            sha256: "sha256:2a5749531966b54fc67e41bcd781d375a42349c392145e85882fb97d3b12c8f8"
+                .to_string(),
+        },
+        BrowserArtifactRecord {
             path: "index.html".to_string(),
             mime_type: "text/html".to_string(),
-            size_bytes: 4096,
-            sha256: "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659"
+            size_bytes: 913,
+            sha256: "sha256:a001ac1fb183b2158ec773c8436f409e80cfe4b788cf7deb16f48d7309d11dca"
                 .to_string(),
         },
         BrowserArtifactRecord {
-            path: "foundry.js".to_string(),
+            path: "prism_foundry_web.js".to_string(),
             mime_type: "application/javascript".to_string(),
-            size_bytes: 81920,
-            sha256: "sha256:a4b513bc759d57a9cfda598b049d5a6c38234dbb9b5fef729a4bb3c61304526d"
+            size_bytes: 6300,
+            sha256: "sha256:934556d47c4e35be39a73ea5c3e5a0d6159fc8455a4867bedfea595ee7d10ac4"
                 .to_string(),
         },
         BrowserArtifactRecord {
-            path: "foundry_bg.wasm".to_string(),
+            path: "prism_foundry_web_bg.wasm".to_string(),
             mime_type: "application/wasm".to_string(),
-            size_bytes: 524288,
-            sha256: "sha256:e834608c0efee76a9117cf489e02e1b12b557b7f16f56e9c470a2f5bc289128d"
+            size_bytes: 34948,
+            sha256: "sha256:33f7ca6c8ff1bbf9832984210cc6b3b8965a823d2505e4a959bb21e18989dac7"
                 .to_string(),
         },
         BrowserArtifactRecord {
-            path: "foundry.css".to_string(),
-            mime_type: "text/css".to_string(),
-            size_bytes: 16384,
-            sha256: "sha256:1a84f3df91753c1537e24bcf84ec758ffaa8b5cb3335bc45ecab076fa2e7f8cb"
-                .to_string(),
-        },
-        BrowserArtifactRecord {
-            path: "manifest.json".to_string(),
-            mime_type: "application/manifest+json".to_string(),
-            size_bytes: 1024,
-            sha256: "sha256:4d603a1154c16a8d67ec1d90a5015b678ebaf29e313768b31a896cfab1844b20"
-                .to_string(),
-        },
-        BrowserArtifactRecord {
-            path: "holo_runtime.holo".to_string(),
-            mime_type: "application/octet-stream".to_string(),
-            size_bytes: 262144,
-            sha256: "sha256:c986161476d05ca91d6c8230eeef2356c9d7494f1b49e1a90c0ef69c2ebf91b7"
+            path: "provenance.json".to_string(),
+            mime_type: "application/json".to_string(),
+            size_bytes: 656,
+            sha256: "sha256:3ca65ccdd7f985a5efb4a5571507785cc2ccb2aef90777b3944d4b19a3ffa144"
                 .to_string(),
         },
     ]
@@ -75,8 +75,8 @@ fn publisher_binding_verifies_producer_and_scope_integrity_pb_01() {
     // 1. Verify exact producer release identity
     PublisherBindingEngine::verify_producer_identity(
         cfg,
-        "df50044df62eb0ef7ffebec2804561a9d16b5fc7",
-        "docker.io/library/uor-foundry-sdk@sha256:c2e0e50437e13d9b2e382d3af4ae7a962b469721b9b80f14f215d9254e8ed78f",
+        "b82a770c8680d2ca142d713915bcbafe0ca74a5e",
+        "ghcr.io/uor-foundation/prismpm-sdk-candidate@sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21",
     )
     .expect("producer release identity verified");
 
@@ -84,7 +84,7 @@ fn publisher_binding_verifies_producer_and_scope_integrity_pb_01() {
     let expected_assets = expected_distribution_assets();
     PublisherBindingEngine::verify_artifact_tree(
         cfg,
-        "sha256:d8c6b75aeae8c4974fbc173b2c12217c4e5ff09ab683b5444fae9eb10a2bb194",
+        "sha256:7b32237988c5c0831a374a795d00fae31c0e93871fd99a22f227c64ac96dd7db",
         &expected_assets,
     )
     .expect("artifact tree and distribution assets verified");

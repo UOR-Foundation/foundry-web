@@ -15,7 +15,7 @@ platform_scope_integrity_preserved = true
 [closure_evidence]
 publisher_repository = "https://github.com/UOR-Foundation/foundry-web"
 producer_repository = "https://github.com/UOR-Foundation/uor-foundry"
-producer_release_commit = "df50044df62eb0ef7ffebec2804561a9d16b5fc7"
+producer_release_commit = "b82a770c8680d2ca142d713915bcbafe0ca74a5e"
 target_deployment_url = "https://uor-foundation.github.io/foundry-web/"
 closure_verdict = "ACCEPTED_AND_CLOSED"
 
