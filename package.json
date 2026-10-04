@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/publication/*.test.mjs",
+    "test:journeys": "node tests/e2e/test_m4_journey_matrix.mjs",
     "audit:deployed": "node tests/e2e/audit-deployed.mjs"
   },
   "devDependencies": {
