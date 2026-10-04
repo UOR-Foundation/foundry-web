@@ -75,7 +75,7 @@ fn publisher_binding_verifies_producer_and_scope_integrity_pb_01() {
     // 1. Verify exact producer release identity
     PublisherBindingEngine::verify_producer_identity(
         cfg,
-        "b82a770c8680d2ca142d713915bcbafe0ca74a5e",
+        "0aaf615923fd9b464b555f80cfa36aa5da6d98ed",
         "ghcr.io/uor-foundation/prismpm-sdk-candidate@sha256:60226bc791d4c0e5613402a6be7e63f4963d3faf7f327befcf56fc0e41d0ce21",
     )
     .expect("producer release identity verified");

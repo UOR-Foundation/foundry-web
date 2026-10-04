@@ -39,28 +39,28 @@ fn live_acceptance_verifies_deployed_bytes_and_core_journeys_la_01() {
     // 3. DEP-CHK-03: Live Artifact Digest Byte Matching
     let expected_assets = [
         (
+            "app.css",
+            "sha256:93a8e4a6a873f55f56a7adb3a55a49912bdcddd740b1af52f9a27f1403ea0279",
+        ),
+        (
+            "app.js",
+            "sha256:2a5749531966b54fc67e41bcd781d375a42349c392145e85882fb97d3b12c8f8",
+        ),
+        (
             "index.html",
-            "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659",
+            "sha256:a001ac1fb183b2158ec773c8436f409e80cfe4b788cf7deb16f48d7309d11dca",
         ),
         (
-            "foundry.js",
-            "sha256:a4b513bc759d57a9cfda598b049d5a6c38234dbb9b5fef729a4bb3c61304526d",
+            "prism_foundry_web.js",
+            "sha256:934556d47c4e35be39a73ea5c3e5a0d6159fc8455a4867bedfea595ee7d10ac4",
         ),
         (
-            "foundry_bg.wasm",
-            "sha256:e834608c0efee76a9117cf489e02e1b12b557b7f16f56e9c470a2f5bc289128d",
+            "prism_foundry_web_bg.wasm",
+            "sha256:33f7ca6c8ff1bbf9832984210cc6b3b8965a823d2505e4a959bb21e18989dac7",
         ),
         (
-            "foundry.css",
-            "sha256:1a84f3df91753c1537e24bcf84ec758ffaa8b5cb3335bc45ecab076fa2e7f8cb",
-        ),
-        (
-            "manifest.json",
-            "sha256:4d603a1154c16a8d67ec1d90a5015b678ebaf29e313768b31a896cfab1844b20",
-        ),
-        (
-            "holo_runtime.holo",
-            "sha256:c986161476d05ca91d6c8230eeef2356c9d7494f1b49e1a90c0ef69c2ebf91b7",
+            "provenance.json",
+            "sha256:3ca65ccdd7f985a5efb4a5571507785cc2ccb2aef90777b3944d4b19a3ffa144",
         ),
     ];
     LiveAcceptanceEngine::verify_live_payload_digests(cfg, &expected_assets, &expected_assets)
@@ -128,7 +128,7 @@ fn live_byte_mismatch_fails_payload_check() {
 
     let expected = [(
         "index.html",
-        "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659",
+        "sha256:a001ac1fb183b2158ec773c8436f409e80cfe4b788cf7deb16f48d7309d11dca",
     )];
     let corrupted = [(
         "index.html",
@@ -148,16 +148,16 @@ fn missing_live_asset_fails_payload_check() {
     let expected = [
         (
             "index.html",
-            "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659",
+            "sha256:a001ac1fb183b2158ec773c8436f409e80cfe4b788cf7deb16f48d7309d11dca",
         ),
         (
-            "foundry.js",
-            "sha256:a4b513bc759d57a9cfda598b049d5a6c38234dbb9b5fef729a4bb3c61304526d",
+            "app.js",
+            "sha256:2a5749531966b54fc67e41bcd781d375a42349c392145e85882fb97d3b12c8f8",
         ),
     ];
     let incomplete = [(
         "index.html",
-        "sha256:7b52662c140dfaa60eefbc603cd7a7f457ffad04543ff32a5ec2c6a084c7a659",
+        "sha256:a001ac1fb183b2158ec773c8436f409e80cfe4b788cf7deb16f48d7309d11dca",
     )];
 
     let res = LiveAcceptanceEngine::verify_live_payload_digests(cfg, &incomplete, &expected);

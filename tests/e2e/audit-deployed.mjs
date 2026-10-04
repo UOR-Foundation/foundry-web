@@ -42,7 +42,7 @@ try {
 // The unbound diagnostic inspects the audited legacy deployment only. CI must
 // use the actual SDK inventory, never the legacy filenames as an output model.
 const paths = integrity ? integrity.files.map(file => file.path)
-  : ['index.html', 'foundry.js', 'foundry.css', 'foundry_bg.wasm', 'holo_runtime.holo', 'manifest.json'];
+  : ['app.css', 'app.js', 'index.html', 'prism_foundry_web.js', 'prism_foundry_web_bg.wasm', 'provenance.json'];
 for (const path of paths) {
   try {
     const response = await fetch(new URL(path, target), { redirect: 'error', signal: AbortSignal.timeout(30000) });

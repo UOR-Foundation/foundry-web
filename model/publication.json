@@ -1,5 +1,11 @@
 {
   "schema": "foundry/publication-selection/1",
   "target": "https://uor-foundation.github.io/foundry-web/",
-  "release": null
+  "release": {
+    "reference": "ghcr.io/uor-foundation/uor-foundry@sha256:c2e0e50437e13d9b2e382d3af4ae7a962b469721b9b80f14f215d9254e8ed78f",
+    "policy_digest": "sha256:91bf34020a5664bead868fbfa89196b6e41bf1684fa6e3f8484196c342ebcb92",
+    "model_digest": "sha256:df50044df62eb0ef7ffebec2804561a9d16b5fc7000000000000000000000000",
+    "build_digest": "sha256:966d02de11095d19c95d14c08a957f1be0a4b07b80919488313f7884399e459a",
+    "tree_digest": "sha256:7b32237988c5c0831a374a795d00fae31c0e93871fd99a22f227c64ac96dd7db"
+  }
 }
