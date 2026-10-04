@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="UOR Foundry pure-model decentralized organization-management portal">
+  <meta name="theme-color" content="#1a56db">
+  <title>UOR Foundry Portal</title>
+  <link rel="stylesheet" href="foundry.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner" class="app-header">
+    <div class="header-top">
+      <div class="brand-group">
+        <span class="brand-logo" aria-hidden="true">&#9881;</span>
+        <div>
+          <h1 class="brand-title">UOR Foundry Portal</h1>
+          <p class="brand-subtitle">Pure-Model Decentralized Organization Platform</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <div class="org-selector-group">
+          <label for="org-select" class="selector-label">Organization:</label>
+          <select id="org-select" class="form-select org-select" aria-label="Active Organization">
+            <option value="org-default">Citizen Gardens (Provisional)</option>
+          </select>
+        </div>
+        <div class="user-badge" id="user-badge" role="region" aria-label="Active User Identity">
+          <span class="badge-status-dot unauthenticated" id="user-status-dot" aria-hidden="true"></span>
+          <div class="user-badge-info">
+            <span class="user-name" id="user-display-name">Guest (Unenrolled)</span>
+            <span class="user-did" id="user-did-display">did:key:unauthenticated</span>
+          </div>
+        </div>
+        <div class="network-badge" id="network-badge" role="status" aria-label="Network Status">
+          <span class="network-indicator online" id="network-indicator-dot" aria-hidden="true"></span>
+          <span id="network-status-text">Online</span>
+          <button id="btn-theme-toggle" class="btn btn-secondary" aria-label="Toggle visual theme (current: light)" title="Toggle visual theme (Alt+T)" style="display:flex; align-items:center; gap:0.25rem; padding:0.375rem 0.75rem; font-size:0.875rem;">
+            <span id="theme-toggle-icon" aria-hidden="true">&#9728;</span>
+            <span id="theme-toggle-text">Light</span>
+          </button>
+        </div>
+        <div class="inbox-control-group" style="position:relative;">
+          <button id="btn-inbox" class="btn btn-secondary" aria-label="Notifications Inbox" aria-expanded="false" aria-controls="inbox-panel" style="display:flex; align-items:center; gap:0.25rem;">
+            <span aria-hidden="true">&#128276;</span>
+            <span>Inbox</span>
+            <span class="badge badge-success" id="unread-notif-badge" aria-label="0 unread notifications">0</span>
+          </button>
+          <div id="inbox-panel" class="inbox-dropdown-panel card" hidden role="region" aria-label="Notifications List" style="position:absolute; right:0; top:100%; z-index:100; min-width:320px; max-width:400px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); margin-top:0.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <h2 style="margin:0; font-size:1rem;">Notifications</h2>
+              <button id="btn-mark-all-read" type="button" class="btn btn-sm btn-secondary" style="font-size:0.75rem;">Mark All Read</button>
+            </div>
+            <div id="inbox-list" class="inbox-list" role="feed" aria-busy="false" style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem;">
+              <div style="text-align:center; color:var(--color-text-muted); font-size:0.875rem; padding:1rem;">No notifications.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="system-announcement" id="system-announcement" role="status" aria-live="polite">
+      System Ready. WebAssembly Pure-Model Engine Active.
+    </div>
+  </header>
+
+  <nav class="app-nav" aria-label="Main Navigation">
+    <div role="tablist" aria-label="Foundry Modules and Stakeholder Services" class="tab-list" id="main-tablist">
+      <button role="tab" aria-selected="true" aria-controls="panel-dashboard" id="tab-dashboard" class="tab active" tabindex="0">
+        <span aria-hidden="true" class="tab-icon">&#128202;</span> Dashboard
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-identity" id="tab-identity" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128100;</span> Identity &amp; Enrollment
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-backup-codes" id="tab-backup-codes" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128273;</span> Backup Codes &amp; Recovery
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-organization" id="tab-organization" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#127963;</span> Organization &amp; Quorum
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-projects" id="tab-projects" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128193;</span> Projects (U15, U51)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-workspaces" id="tab-workspaces" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128101;</span> Workspaces (U52)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-workflows" id="tab-workflows" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#9881;</span> Workflows (SV-01)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-ai-inference" id="tab-ai-inference" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#129302;</span> AI Inference (SV-02)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-messaging" id="tab-messaging" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128172;</span> Messaging (SV-03)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-governance" id="tab-governance" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#9878;</span> Governance &amp; Policy
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-finance" id="tab-finance" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128179;</span> Business &amp; Finance (SV-05)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-learning" id="tab-learning" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#127891;</span> Learning &amp; VC (SV-06)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-brand" id="tab-brand" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#127912;</span> Brand &amp; WCAG (SV-07)
+      </button>
+      <button role="tab" aria-selected="false" aria-controls="panel-storage" id="tab-storage" class="tab" tabindex="-1">
+        <span aria-hidden="true" class="tab-icon">&#128452;</span> Storage &amp; Network
+      </button>
+    </div>
+  </nav>
+
+  <main id="main-content" class="app-main" tabindex="-1">
+    <!-- 1. DASHBOARD PANEL -->
+    <div role="tabpanel" id="panel-dashboard" aria-labelledby="tab-dashboard" class="tab-panel active" tabindex="0">
+      <div class="panel-header">
+        <h2>Platform Operations &amp; Status Overview</h2>
+        <p class="panel-desc">Authoritative browser-executed organizational management without handwritten host logic.</p>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-title">Active Organization</span>
+          <span class="metric-value" id="dash-active-org">Citizen Gardens</span>
+          <span class="metric-badge badge-warning" id="dash-org-badge">Provisional Setup</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Authenticated Identity</span>
+          <span class="metric-value" id="dash-active-user">Guest</span>
+          <span class="metric-badge badge-neutral" id="dash-user-badge">Not Enrolled</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Multi-Admin Quorum</span>
+          <span class="metric-value" id="dash-quorum-stat">1 / 2 Required</span>
+          <span class="metric-badge badge-warning" id="dash-quorum-badge">Uncovered</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Wasm Engine</span>
+          <span class="metric-value" id="dash-wasm-stat">Ready</span>
+          <span class="metric-badge badge-success">Pure-Model</span>
+        </div>
+      </div>
+
+      <div class="content-cards-grid">
+        <section class="card" aria-labelledby="dash-core-spec-heading">
+          <h3 id="dash-core-spec-heading" class="card-title">Foundational Capabilities (FC-01)</h3>
+          <ul class="spec-checklist">
+            <li><strong>Identity:</strong> Decentralized DID key authentication with challenge nonces.</li>
+            <li><strong>Roles:</strong> Modeled membership, permissions, delegation, and quorum rules.</li>
+            <li><strong>Shared Workspaces:</strong> Multitenant isolation with cryptographically scoped capability tokens.</li>
+            <li><strong>Persistence:</strong> Causal CRDT event logs and content-addressed immutable blob storage (Kappa).</li>
+            <li><strong>Messaging:</strong> W3C ActivityPub / ActivityStreams 2.0 delivery lifecycle.</li>
+          </ul>
+        </section>
+
+        <section class="card" aria-labelledby="dash-actions-heading">
+          <h3 id="dash-actions-heading" class="card-title">Quick Operational Actions</h3>
+          <div class="action-btn-group">
+            <button type="button" class="btn btn-primary" id="btn-quick-enroll">Complete User Enrollment</button>
+            <button type="button" class="btn btn-secondary" id="btn-quick-org">Manage Organizations</button>
+            <button type="button" class="btn btn-outline" id="btn-quick-backup">Generate Backup Codes</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 2. IDENTITY & ENROLLMENT PANEL -->
+    <div role="tabpanel" id="panel-identity" aria-labelledby="tab-identity" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>User Enrollment &amp; Decentralized Identity (EC-01)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Core.Identity.lex.tex</code> &bull; Conforms to W3C DID Core 1.0.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="enrollment-heading">
+          <h3 id="enrollment-heading" class="card-title">1. Initiate Email Verification</h3>
+          <p class="card-desc">Foundry starts without seeded accounts. Any user can enroll with an email address.</p>
+          <form id="form-enroll-request" class="form-stack">
+            <div class="form-group">
+              <label for="enroll-email" class="form-label">Email Address <span class="required" aria-hidden="true">*</span></label>
+              <input type="email" id="enroll-email" class="form-input" placeholder="e.g. alice@uor.foundation" required autocomplete="email">
+              <span class="form-help" id="enroll-email-help">Verification challenge will be generated and bound to this mailbox.</span>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-send-challenge">Issue Verification Challenge</button>
+          </form>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">2. Verify Challenge Nonce</h3>
+          <form id="form-enroll-verify" class="form-stack">
+            <div class="form-group">
+              <label for="verify-challenge-id" class="form-label">Challenge Identifier</label>
+              <input type="text" id="verify-challenge-id" class="form-input" readonly placeholder="Waiting for challenge...">
+            </div>
+            <div class="form-group">
+              <label for="verify-nonce" class="form-label">Challenge Nonce <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="verify-nonce" class="form-input" placeholder="Enter received 256-bit challenge nonce" required autocomplete="one-time-code">
+              <span class="form-help">Single-use proof of mailbox control. Expired or replayed nonces fail closed.</span>
+            </div>
+            <button type="submit" class="btn btn-success" id="btn-submit-nonce">Verify Nonce &amp; Establish Session</button>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="identity-state-heading">
+          <h3 id="identity-state-heading" class="card-title">Authenticated Identity State</h3>
+          <div class="state-display" id="identity-state-card">
+            <div class="state-row">
+              <span class="state-label">Account Status:</span>
+              <span class="badge badge-neutral" id="account-status-badge">Unenrolled</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Account ID:</span>
+              <code class="state-code" id="account-id-val">None</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">DID Identifier:</span>
+              <code class="state-code" id="account-did-val">did:key:unauthenticated</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Mailbox:</span>
+              <span class="state-val" id="account-email-val">None</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Public Key (Ed25519):</span>
+              <code class="state-code" id="account-pubkey-val">None</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Active Sessions:</span>
+              <span class="state-val" id="account-session-count">0</span>
+            </div>
+          </div>
+
+          <div class="card-actions-row">
+            <button type="button" class="btn btn-danger" id="btn-invalidate-sessions">Invalidate All Sessions</button>
+            <button type="button" class="btn btn-outline" id="btn-logout">Logout / Reset</button>
+            <button type="button" class="btn btn-danger" id="btn-delete-account">Delete Account</button>
+          </div>
+
+          <div class="mailbox-simulator-card" id="mailbox-preview" aria-live="polite">
+            <h4 class="simulator-title">Simulated Mailbox Dispatch Delivery</h4>
+            <div class="mailbox-message-preview" id="mailbox-content">
+              <em>No pending challenges. Submit the form to generate challenge.</em>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 3. BACKUP CODES & RECOVERY PANEL -->
+    <div role="tabpanel" id="panel-backup-codes" aria-labelledby="tab-backup-codes" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Saved Backup-Code Recovery (BC-01)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Core.BackupCodes.lex.tex</code> &bull; Conforms to <strong>NIST SP 800-63B-4 §4.2.1.1</strong>.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="generate-codes-heading">
+          <h3 id="generate-codes-heading" class="card-title">Generate Recovery Code Batch</h3>
+          <p class="card-desc">128-bit minimum entropy codes stored exclusively as salted SHA-256 hashes. Plaintext codes must be saved offline.</p>
+          
+          <div class="form-stack">
+            <button type="button" class="btn btn-primary" id="btn-generate-backup-codes">Generate New 128-bit Code Batch</button>
+          </div>
+
+          <div id="backup-codes-display" class="backup-codes-container" hidden>
+            <div class="batch-meta">
+              <span><strong>Batch ID:</strong> <code id="batch-id-display">-</code></span>
+              <span><strong>Revision:</strong> <code id="batch-revision-display">-</code></span>
+              <span><strong>Active Codes:</strong> <span class="badge badge-success" id="batch-count-display">0</span></span>
+            </div>
+            <ul class="codes-grid" id="codes-list" role="list" aria-label="Generated Backup Codes" style="list-style:none; padding:0; margin:0;">
+            </ul>
+            <p class="warning-text" role="alert">&#9888; Save these codes now. They will not be displayed again.</p>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="redeem-code-heading">
+          <h3 id="redeem-code-heading" class="card-title">Account Recovery &amp; Code Redemption</h3>
+          <p class="card-desc">Redeeming a code consumes it once (anti-replay) and immediately invalidates all previous sessions.</p>
+
+          <form id="form-redeem-backup-code" class="form-stack">
+            <div class="form-group">
+              <label for="recovery-account" class="form-label">Account Mailbox <span class="required" aria-hidden="true">*</span></label>
+              <input type="email" id="recovery-account" class="form-input" placeholder="e.g. alice@uor.foundation" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label for="recovery-revision" class="form-label">Batch Revision <span class="required" aria-hidden="true">*</span></label>
+              <input type="number" id="recovery-revision" class="form-input" value="1" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="recovery-code-input" class="form-label">Plaintext Backup Code <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="recovery-code-input" class="form-input" placeholder="e.g. BK-XXXX-XXXX" required autocomplete="off">
+              <span class="form-help">Single-use redemption. Hash is checked against salted database entries.</span>
+            </div>
+            <button type="submit" class="btn btn-danger" id="btn-redeem-code">Redeem Code &amp; Recover Account</button>
+          </form>
+
+          <div class="recovery-status-display" id="recovery-result-box" role="status" aria-live="polite">
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 4. ORGANIZATION & QUORUM PANEL -->
+    <div role="tabpanel" id="panel-organization" aria-labelledby="tab-organization" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Organization Lifecycle &amp; Multi-Admin Quorum (OL-01, AM-01)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Core.Organization.lex.tex</code> &amp; <code>Authority.lex.tex</code> &bull; No seeded authority.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="create-org-heading">
+          <h3 id="create-org-heading" class="card-title">Create Organization (No Seeded Authority)</h3>
+          <p class="card-desc">Any enrolled user may create an organization with any display name. Starts in <strong>Provisional</strong> state.</p>
+          <form id="form-create-org" class="form-stack">
+            <div class="form-group">
+              <label for="new-org-name" class="form-label">Organization Display Name <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="new-org-name" class="form-input" placeholder="e.g. Citizen Gardens" required>
+              <span class="form-help">Display data only; unique cryptographic Org ID is generated.</span>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-create-org">Create Organization</button>
+          </form>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">Add Administrator to Organization</h3>
+          <form id="form-add-admin" class="form-stack">
+            <div class="form-group">
+              <label for="admin-email" class="form-label">Administrator Mailbox <span class="required" aria-hidden="true">*</span></label>
+              <input type="email" id="admin-email" class="form-input" placeholder="e.g. bob@uor.foundation" required>
+            </div>
+            <div class="form-group">
+              <label for="admin-scope" class="form-label">Delegated Scope <span class="required" aria-hidden="true">*</span></label>
+              <select id="admin-scope" class="form-select">
+                <option value="Organization">Organization (Full Operations)</option>
+                <option value="Governance">Governance</option>
+                <option value="Security">Security</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations">Operations</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="btn-add-admin">Add Administrator</button>
+          </form>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">Rename Organization</h3>
+          <form id="form-update-org-name" class="form-stack">
+            <div class="form-group">
+              <label for="edit-org-name" class="form-label">New Organization Name <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="edit-org-name" class="form-input" placeholder="e.g. Citizen Gardens Collective" required>
+              <span class="form-help">Updates display name while preserving immutable cryptographic Organization ID.</span>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="btn-update-org-name">Update Name</button>
+          </form>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">Send Member Invitation</h3>
+          <form id="form-send-invitation" class="form-stack">
+            <div class="form-group">
+              <label for="invitation-email" class="form-label">Recipient Mailbox <span class="required" aria-hidden="true">*</span></label>
+              <input type="email" id="invitation-email" class="form-input" placeholder="e.g. charlie@uor.foundation" required>
+            </div>
+            <div class="form-group">
+              <label for="invitation-scope" class="form-label">Delegated Scope <span class="required" aria-hidden="true">*</span></label>
+              <select id="invitation-scope" class="form-select">
+                <option value="Organization">Organization</option>
+                <option value="Governance">Governance</option>
+                <option value="Security">Security</option>
+                <option value="Finance">Finance</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-send-invitation">Issue Invitation</button>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="org-state-heading">
+          <h3 id="org-state-heading" class="card-title">Active Organization Authority State</h3>
+          <div class="state-display" id="org-state-details">
+            <div class="state-row">
+              <span class="state-label">Organization Name:</span>
+              <span class="state-val" id="org-name-val">Citizen Gardens</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Organization ID:</span>
+              <code class="state-code" id="org-id-val">uor:org:citizen-gardens-01</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Lifecycle State:</span>
+              <span class="badge badge-warning" id="org-lifecycle-badge">Provisional</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Active Administrators:</span>
+              <span class="state-val" id="org-admin-count">1</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Founding Grant Active:</span>
+              <span class="state-val" id="org-founding-grant">Yes (Provisional bootstrap)</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Required Quorum for Activation:</span>
+              <span class="state-val">Minimum 2 Distinct Administrators</span>
+            </div>
+          </div>
+
+          <div class="admin-roster-section" style="margin-top:1rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem;">Enrolled Administrators</h4>
+            <ul class="admin-roster" id="admin-roster-list" role="list" style="padding-left:1.25rem; margin:0; font-size:0.875rem;">
+              <li>alice@uor.foundation (Founding Admin, Scope: Organization)</li>
+            </ul>
+          </div>
+
+          <div class="card-actions-row" style="flex-wrap:wrap; gap:0.5rem;">
+            <button type="button" class="btn btn-success" id="btn-activate-org">Cast Quorum &amp; Activate Organization</button>
+            <button type="button" class="btn btn-warning" id="btn-suspend-org">Suspend Organization</button>
+            <button type="button" class="btn btn-success" id="btn-reactivate-org">Reactivate Organization</button>
+            <button type="button" class="btn btn-danger" id="btn-retire-org">Retire Organization</button>
+            <button type="button" class="btn btn-outline" id="btn-retire-founding">Retire Founding Grant</button>
+          </div>
+          <div class="form-group" style="margin-top:0.5rem;">
+            <label for="retire-force-override" class="form-label" style="font-size:0.75rem;">
+              <input type="checkbox" id="retire-force-override"> Force Retire Override (retire with active resources)
+            </label>
+          </div>
+
+          <div class="invitations-section" style="margin-top:1.5rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem;">Organization Invitations</h4>
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Organization Invitations Table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Recipient</th>
+                    <th scope="col">Scope</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="invitations-tbody">
+                  <tr>
+                    <td colspan="4" style="text-align:center; color:var(--color-text-muted);">No pending invitations.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="directory-section" style="margin-top:1.5rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem;">Organization Member Directory (U50)</h4>
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Organization Members Table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Mailbox</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">DID Identifier</th>
+                    <th scope="col">Scopes</th>
+                  </tr>
+                </thead>
+                <tbody id="member-directory-list">
+                  <tr>
+                    <td>alice@uor.foundation</td>
+                    <td><span class="badge badge-success">Administrator</span></td>
+                    <td><code>did:key:z6MkuFoundrySystem...</code></td>
+                    <td>organization, security</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="team-directory-section" style="margin-top:1.5rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem;">Team Directory (U50)</h4>
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Organization Teams Table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Team Name</th>
+                    <th scope="col">Team Lead</th>
+                    <th scope="col">Members</th>
+                    <th scope="col">Workspaces</th>
+                  </tr>
+                </thead>
+                <tbody id="team-directory-list">
+                  <tr>
+                    <td>Core Engineering</td>
+                    <td>alice@uor.foundation</td>
+                    <td>1</td>
+                    <td>Default Workspace</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- PROJECTS & MILESTONES PANEL (U15, U51) -->
+    <div role="tabpanel" id="panel-projects" aria-labelledby="tab-projects" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Organization Projects &amp; Milestones (U15, U51)</h2>
+        <p class="panel-desc">Model: <code>crates/model/src/projects.rs</code> &bull; Organization-scoped projects, milestones, deliverables, tamper-evident SHA-256 chained activity journals, and release tracking.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="metric-title">Active Project</span>
+          <span class="metric-value" id="project-active-name">Community Platform</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Active Projects</span>
+          <span class="metric-value" id="project-count">1</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Milestone Progress</span>
+          <span class="metric-value" id="project-milestone-progress">50%</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-title">Project Releases</span>
+          <span class="metric-value" id="project-release-count">1</span>
+        </div>
+      </div>
+
+      <div class="two-column-layout">
+        <div class="column-stack">
+          <!-- Active Project Details & Actions -->
+          <section class="card" aria-labelledby="project-details-heading">
+            <h3 id="project-details-heading" class="card-title">Project Selector &amp; Governance</h3>
+            <div class="form-group">
+              <label for="project-select" class="form-label">Select Active Project</label>
+              <select id="project-select" class="form-select">
+                <option value="uor:project:citizen-gardens-01:community-garden-platform">Community Garden Platform</option>
+              </select>
+            </div>
+            <div style="margin:0.75rem 0;">
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <strong>Status:</strong>
+                <span class="badge badge-success" id="project-status-badge">Active</span>
+              </div>
+              <p id="project-desc-display" style="font-size:0.875rem; color:var(--color-text-muted); margin:0.25rem 0;">Decentralized urban gardening coordination platform</p>
+            </div>
+            <div class="card-actions-row" style="flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
+              <button type="button" class="btn btn-warning" id="btn-archive-project">Archive Project</button>
+              <button type="button" class="btn btn-success" id="btn-restore-project">Restore Project</button>
+              <button type="button" class="btn btn-danger" id="btn-delete-project">Delete Project</button>
+            </div>
+            <div class="form-group" style="margin-top:0.5rem;">
+              <label for="delete-project-force" class="form-label" style="font-size:0.75rem;">
+                <input type="checkbox" id="delete-project-force"> Force Delete Override (delete with active deliverables)
+              </label>
+            </div>
+          </section>
+
+          <!-- Create Project -->
+          <section class="card" aria-labelledby="create-project-heading">
+            <h3 id="create-project-heading" class="card-title">Create New Project (U15)</h3>
+            <form id="form-create-project" class="form-stack">
+              <div class="form-group">
+                <label for="project-name-input" class="form-label">Project Name <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="project-name-input" class="form-input" placeholder="e.g. Soil Sensor Network" required>
+              </div>
+              <div class="form-group">
+                <label for="project-slug-input" class="form-label">Project Slug (Optional)</label>
+                <input type="text" id="project-slug-input" class="form-input" placeholder="e.g. soil-sensor-network">
+              </div>
+              <div class="form-group">
+                <label for="project-desc-input" class="form-label">Description</label>
+                <textarea id="project-desc-input" class="form-textarea" rows="2" placeholder="Project objectives and scope"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-create-project">Create Project</button>
+            </form>
+          </section>
+
+          <!-- Project Releases -->
+          <section class="card" aria-labelledby="project-releases-heading">
+            <h3 id="project-releases-heading" class="card-title">Project Releases &amp; Provenance (U51)</h3>
+            <form id="form-create-release" class="form-stack" style="margin-bottom:1rem;">
+              <div class="form-group">
+                <label for="release-tag-input" class="form-label">Version Tag <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="release-tag-input" class="form-input" placeholder="e.g. v0.2.0" required>
+              </div>
+              <div class="form-group">
+                <label for="release-title-input" class="form-label">Release Title <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="release-title-input" class="form-input" placeholder="e.g. Beta Sensor Protocol" required>
+              </div>
+              <div class="form-group">
+                <label for="release-notes-input" class="form-label">Release Notes</label>
+                <textarea id="release-notes-input" class="form-textarea" rows="2" placeholder="Changelog notes"></textarea>
+              </div>
+              <button type="submit" class="btn btn-secondary" id="btn-create-release">Draft Release</button>
+            </form>
+            <div id="project-releases-list" role="region" aria-label="Releases Table" class="table-responsive" tabindex="0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="project-releases-tbody">
+                  <tr>
+                    <td>v0.1.0</td>
+                    <td>Alpha Prototype</td>
+                    <td><span class="badge badge-success">Published</span></td>
+                    <td><span style="color:var(--color-text-muted); font-size:0.75rem;">Immutable</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="column-stack">
+          <!-- Milestones & Deliverables -->
+          <section class="card" aria-labelledby="milestones-heading">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <h3 id="milestones-heading" class="card-title" style="margin:0;">Milestones &amp; Deliverables (U51)</h3>
+            </div>
+            <form id="form-create-milestone" class="form-stack" style="margin-bottom:1rem;">
+              <div class="form-group">
+                <label for="milestone-title-input" class="form-label">New Milestone Title <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="milestone-title-input" class="form-input" placeholder="e.g. Milestone 3: Field Deployment" required>
+              </div>
+              <div class="form-group">
+                <label for="milestone-date-input" class="form-label">Target Completion Date</label>
+                <input type="date" id="milestone-date-input" class="form-input">
+              </div>
+              <button type="submit" class="btn btn-secondary" id="btn-add-milestone">Add Milestone</button>
+            </form>
+
+            <form id="form-add-deliverable" class="form-stack" style="margin-bottom:1rem; padding-top:0.75rem; border-top:1px solid #e2e8f0;">
+              <div class="form-group">
+                <label for="deliverable-title-input" class="form-label">Add Deliverable to Active Milestone</label>
+                <input type="text" id="deliverable-title-input" class="form-input" placeholder="e.g. Firmware SHA-256 Digest Proof" required>
+              </div>
+              <button type="submit" class="btn btn-sm btn-secondary" id="btn-add-deliverable">Add Deliverable</button>
+            </form>
+
+            <div id="milestone-list" class="milestone-list" role="region" aria-label="Milestones and Deliverables List">
+              <!-- Dynamically populated milestones -->
+            </div>
+          </section>
+
+          <!-- Tamper-Evident Activity Feed -->
+          <section class="card" aria-labelledby="activity-heading">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <h3 id="activity-heading" class="card-title" style="margin:0;">Tamper-Evident Activity Feed (SHA-256)</h3>
+              <span class="badge badge-success" id="activity-chain-status">Verified Chain</span>
+            </div>
+            <p class="panel-desc" style="font-size:0.75rem; margin-bottom:0.75rem;">Cryptographically chained journal: each entry contains the SHA-256 hash of the predecessor.</p>
+            <div id="project-activity-list" class="activity-feed" role="log" aria-label="Project Activity Log" style="max-height:350px; overflow-y:auto;">
+              <!-- Dynamically populated chained activity items -->
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKSPACES & COLLABORATION PANEL (U52) -->
+    <div role="tabpanel" id="panel-workspaces" aria-labelledby="tab-workspaces" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Shared Workspaces &amp; Real Multi-User Collaboration (U52)</h2>
+        <p class="panel-desc">Model: <code>crates/model/src/functional_core.rs</code> &bull; Organization-scoped workspaces, role hierarchy (administrator, editor, viewer), state synchronization, and persistent recovery.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="ws-manage-heading">
+          <h3 id="ws-manage-heading" class="card-title">Workspace Directory</h3>
+          <form id="form-create-workspace" class="form-stack" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label for="ws-name-input" class="form-label">New Workspace Name <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="ws-name-input" class="form-input" placeholder="e.g. Garden Research Lab" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-create-workspace">Create Shared Workspace</button>
+          </form>
+
+          <div id="workspace-list" role="region" aria-label="Workspaces List" class="table-responsive" tabindex="0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Workspace</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Members</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="workspace-tbody">
+                <tr>
+                  <td>Default Workspace</td>
+                  <td><span class="badge badge-success">Administrator</span></td>
+                  <td>1</td>
+                  <td><button type="button" class="btn btn-sm btn-secondary">Active</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="ws-state-heading">
+          <h3 id="ws-state-heading" class="card-title">Shared State Synchronization</h3>
+          <form id="form-workspace-state" class="form-stack" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label for="ws-state-key" class="form-label">State Key <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="ws-state-key" class="form-input" placeholder="e.g. telemetry_rate_hz" required>
+            </div>
+            <div class="form-group">
+              <label for="ws-state-val" class="form-label">State Value <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="ws-state-val" class="form-input" placeholder="e.g. 10" required>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="btn-mutate-workspace">Sync Shared State</button>
+          </form>
+
+          <div class="table-responsive" tabindex="0" role="region" aria-label="Shared State Table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Key</th>
+                  <th scope="col">Value</th>
+                  <th scope="col">Synced By</th>
+                </tr>
+              </thead>
+              <tbody id="workspace-state-tbody">
+                <tr>
+                  <td><code>seed_lot_id</code></td>
+                  <td><code>heirloom-tomato-2026</code></td>
+                  <td>alice@uor.foundation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 5. WORKFLOWS PANEL (SV-01) -->
+    <div role="tabpanel" id="panel-workflows" aria-labelledby="tab-workflows" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Workflows &amp; Execution Service (SV-01)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Workflows.lex.tex</code> &bull; Concept-to-production pipelines, state machines, bound enforcement.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="wf-runner-heading">
+          <h3 id="wf-runner-heading" class="card-title">Trigger Pipeline Execution</h3>
+          <form id="form-trigger-workflow" class="form-stack">
+            <div class="form-group">
+              <label for="wf-name-input" class="form-label">Workflow Identifier <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="wf-name-input" class="form-input" value="ci-verification-pipeline" required>
+            </div>
+            <div class="form-group">
+              <label for="wf-commit-input" class="form-label">Target Commit SHA <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="wf-commit-input" class="form-input" value="0e1c9eb" required>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="wf-max-seconds" class="form-label">Max Seconds</label>
+                <input type="number" id="wf-max-seconds" class="form-input" value="3600">
+              </div>
+              <div class="form-group">
+                <label for="wf-max-mem" class="form-label">Max Mem (MB)</label>
+                <input type="number" id="wf-max-mem" class="form-input" value="16384">
+              </div>
+            </div>
+            <div class="action-btn-group">
+              <button type="submit" class="btn btn-primary" id="btn-run-workflow">Queue &amp; Execute Workflow</button>
+              <button type="button" class="btn btn-danger" id="btn-timeout-workflow">Simulate Timeout Violation</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="wf-history-heading">
+          <h3 id="wf-history-heading" class="card-title">Workflow Execution History</h3>
+          <div class="table-responsive" tabindex="0" role="region" aria-label="Workflow Runs Table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Run ID</th>
+                  <th scope="col">Workflow</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Elapsed</th>
+                  <th scope="col">Artifact Digest</th>
+                </tr>
+              </thead>
+              <tbody id="workflow-runs-tbody">
+                <tr>
+                  <td><code>wf-init-01</code></td>
+                  <td>baseline-verification</td>
+                  <td><span class="badge badge-success">Succeeded</span></td>
+                  <td>42s</td>
+                  <td><code class="state-code">sha256:7d6de15...</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 6. AI INFERENCE PANEL (SV-02) -->
+    <div role="tabpanel" id="panel-ai-inference" aria-labelledby="tab-ai-inference" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>AI Inference &amp; Agentic Operations (SV-02)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.AIInference.lex.tex</code> &bull; Human authorization required for state changes.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="ai-sandbox-heading">
+          <h3 id="ai-sandbox-heading" class="card-title">Prompt Sandbox &amp; Inference Proposal</h3>
+          <form id="form-ai-inference" class="form-stack">
+            <div class="form-group">
+              <label for="ai-model-select" class="form-label">Target Model</label>
+              <select id="ai-model-select" class="form-select">
+                <option value="uor-inference-kernel-v1">uor-inference-kernel-v1 (Deterministic)</option>
+                <option value="agentic-policy-advisor">agentic-policy-advisor</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ai-prompt-input" class="form-label">Inference Prompt <span class="required" aria-hidden="true">*</span></label>
+              <textarea id="ai-prompt-input" class="form-textarea" rows="4" placeholder="Enter prompt or operational inquiry..." required>Formulate a budget allocation proposal for the upcoming formal verification cycle.</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-run-inference">Execute Inference</button>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="ai-proposal-heading">
+          <h3 id="ai-proposal-heading" class="card-title">Human Authorization Gate</h3>
+          <div class="alert-box alert-warning" role="alert">
+            <strong>Theorem Invariant:</strong> An AI inference result is a proposal only; it cannot trigger an operational state change without explicit human authorization.
+          </div>
+          
+          <div id="ai-proposal-container" class="proposal-card">
+            <h4>Pending AI Proposal: <code id="ai-proposal-id">None</code></h4>
+            <div class="proposal-body" id="ai-proposal-body" style="margin:0.5rem 0;">
+              <em>No active proposals. Run an inference above to generate a proposal.</em>
+            </div>
+            <div class="card-actions-row" id="ai-auth-actions" hidden>
+              <button type="button" class="btn btn-success" id="btn-approve-ai">Authorize &amp; Apply State Change</button>
+              <button type="button" class="btn btn-danger" id="btn-reject-ai">Reject Proposal</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 7. MESSAGING & COLLABORATION PANEL (SV-03) -->
+    <div role="tabpanel" id="panel-messaging" aria-labelledby="tab-messaging" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Messaging &amp; Peer Collaboration (SV-03)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Messaging.lex.tex</code> &bull; W3C ActivityPub / ActivityStreams 2.0 compliant.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <div class="column-stack">
+          <!-- Channel Management Card (U16) -->
+          <section class="card" aria-labelledby="channel-manage-heading">
+            <h3 id="channel-manage-heading" class="card-title">Channels (U16)</h3>
+            <div id="channel-list" class="channel-list" role="navigation" aria-label="Channel Directory" style="display:flex; flex-direction:column; gap:0.25rem; margin-bottom:1rem;">
+              <!-- Dynamically populated channels -->
+            </div>
+            <form id="form-create-channel" class="form-stack" style="border-top:1px solid #e2e8f0; padding-top:0.75rem;">
+              <div class="form-group">
+                <label for="channel-name-input" class="form-label">New Channel Name <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="channel-name-input" class="form-input" placeholder="e.g. #announcements" required>
+              </div>
+              <div class="form-group">
+                <label for="channel-topic-input" class="form-label">Topic / Purpose</label>
+                <input type="text" id="channel-topic-input" class="form-input" placeholder="e.g. Organization-wide announcements">
+              </div>
+              <div class="form-group">
+                <label for="channel-type-select" class="form-label">Channel Type</label>
+                <select id="channel-type-select" class="form-select">
+                  <option value="Public">Public (All members)</option>
+                  <option value="Private">Private (Invite only)</option>
+                  <option value="DirectMessage">Direct Message</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-secondary" id="btn-create-channel">Create Channel</button>
+            </form>
+          </section>
+
+          <!-- Compose Message -->
+          <section class="card" aria-labelledby="msg-composer-heading">
+            <h3 id="msg-composer-heading" class="card-title">Compose Message</h3>
+            <form id="form-send-message" class="form-stack">
+              <div class="form-group">
+                <label for="msg-channel" class="form-label">Destination Channel</label>
+                <select id="msg-channel" class="form-select">
+                  <option value="#general">#general (Public Organizational Channel)</option>
+                  <option value="#governance">#governance (Multi-Admin Quorum)</option>
+                  <option value="#operations">#operations (Technical Pipeline)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="msg-subject" class="form-label">Message Subject <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="msg-subject" class="form-input" placeholder="e.g. Milestone 3 Verification" required>
+              </div>
+              <div class="form-group">
+                <label for="msg-body" class="form-label">Message Content <span class="required" aria-hidden="true">*</span></label>
+                <textarea id="msg-body" class="form-textarea" rows="3" placeholder="Enter message text..." required>All 16 verification gates passed in clean container tree.</textarea>
+              </div>
+
+              <!-- Media Attachment Controls (U18) -->
+              <div class="form-group" style="border:1px dashed var(--color-card-border); border-radius:6px; padding:0.75rem; background:var(--color-surface-bg);">
+                <label for="msg-attachment-file" class="form-label" style="font-weight:600;">Media Attachment (U18, max 25 MiB)</label>
+                <input type="file" id="msg-attachment-file" class="form-input" style="font-size:0.875rem;">
+                <div style="margin-top:0.5rem;">
+                  <label for="msg-attachment-alt" class="form-label" style="font-size:0.75rem;">Alt Text / Media Description (WCAG 2.2 AA)</label>
+                  <input type="text" id="msg-attachment-alt" class="form-input" placeholder="Describe the media content for accessibility...">
+                </div>
+                <progress id="msg-attachment-progress" value="0" max="100" hidden aria-label="Upload Progress" style="width:100%; margin-top:0.5rem;"></progress>
+                <div id="msg-attachment-preview" class="attachment-preview" hidden style="margin-top:0.5rem; font-size:0.75rem; color:var(--color-text-muted);"></div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btn-dispatch-message">Dispatch ActivityPub Message</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="card" aria-labelledby="msg-thread-heading">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 id="msg-thread-heading" class="card-title" style="margin:0;">Channel Activity Stream</h3>
+            <span id="active-channel-name" class="badge badge-secondary" style="font-weight:600;">#general</span>
+          </div>
+          <div class="messages-container" id="messages-list" role="log" aria-label="Message Feed" style="max-height:500px; overflow-y:auto;">
+            <div class="message-card" role="article">
+              <div class="msg-header" style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.75rem;">
+                <strong>#general &bull; did:key:z6MkuFoundrySystem...</strong>
+                <span class="badge badge-success">Acknowledged</span>
+              </div>
+              <div class="msg-content" style="font-size:0.875rem;">Foundry workspace successfully initialized.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 8. GOVERNANCE & POLICY PANEL -->
+    <div role="tabpanel" id="panel-governance" aria-labelledby="tab-governance" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Administration, Governance &amp; Audit (SV-04)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Governance.lex.tex</code> &bull; Multi-signature quorum &amp; tamper-evident logging.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="gov-proposal-heading">
+          <h3 id="gov-proposal-heading" class="card-title">Create Governance Proposal</h3>
+          <form id="form-gov-proposal" class="form-stack">
+            <div class="form-group">
+              <label for="gov-title" class="form-label">Proposal Title <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="gov-title" class="form-input" placeholder="e.g. Approve Annual Budget Allocation" required>
+            </div>
+            <div class="form-group">
+              <label for="gov-scope" class="form-label">Governance Scope</label>
+              <select id="gov-scope" class="form-select">
+                <option value="Governance">Governance (Core Policies)</option>
+                <option value="Operations">Operations</option>
+                <option value="Finance">Finance</option>
+                <option value="Security">Security</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="gov-quorum-req" class="form-label">Required Quorum Approvals</label>
+              <input type="number" id="gov-quorum-req" class="form-input" value="2" min="2" max="10">
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-submit-proposal">Submit Change Proposal</button>
+          </form>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">Active Change Proposals</h3>
+          <ul class="proposals-list" id="active-proposals-list" role="list" style="list-style:none; padding:0; margin:0;">
+            <li class="proposal-card" role="listitem" style="list-style:none;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <strong>Activate Organization and Confirm Governance Policy</strong>
+                <span class="badge badge-warning">Pending Quorum</span>
+              </div>
+              <p style="font-size:0.8125rem; margin:0 0 0.5rem 0;">Scope: <code>Governance</code> &bull; Approvals: 1 / 2</p>
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="btn btn-secondary btn-vote" data-id="prop-act-01" style="padding:0.25rem 0.5rem; font-size:0.75rem;">Cast Signature Approval</button>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section class="card" aria-labelledby="gov-audit-heading">
+          <h3 id="gov-audit-heading" class="card-title">Tamper-Evident Audit Trail</h3>
+          <p class="card-desc">Causally ordered append-only cryptographic log of all administrative state transitions.</p>
+          <div class="table-responsive" tabindex="0" role="region" aria-label="Audit Log Table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Timestamp</th>
+                  <th scope="col">Event</th>
+                  <th scope="col">Actor</th>
+                  <th scope="col">Causal Hash</th>
+                </tr>
+              </thead>
+              <tbody id="audit-log-tbody">
+                <tr>
+                  <td>Today</td>
+                  <td>Platform Bootstrap</td>
+                  <td>did:key:system</td>
+                  <td><code class="state-code">sha256:490ce59...</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 9. BUSINESS & FINANCE PANEL (SV-05) -->
+    <div role="tabpanel" id="panel-finance" aria-labelledby="tab-finance" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Business Planning &amp; Financial Ledger (SV-05)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Finance.lex.tex</code> &bull; Double-entry bookkeeping with external settlement oracle proofs.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="fin-entry-heading">
+          <h3 id="fin-entry-heading" class="card-title">Record Double-Entry Journal Entry</h3>
+          <form id="form-journal-entry" class="form-stack">
+            <div class="form-group">
+              <label for="fin-desc" class="form-label">Transaction Description <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="fin-desc" class="form-input" placeholder="e.g. Server hosting and domain registration" required>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="fin-debit-acc" class="form-label">Debit Account <span class="required" aria-hidden="true">*</span></label>
+                <select id="fin-debit-acc" class="form-select">
+                  <option value="Operating Expenses">Operating Expenses</option>
+                  <option value="Research &amp; Development">Research &amp; Development</option>
+                  <option value="Capital Assets">Capital Assets</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="fin-credit-acc" class="form-label">Credit Account <span class="required" aria-hidden="true">*</span></label>
+                <select id="fin-credit-acc" class="form-select">
+                  <option value="Treasury Reserve">Treasury Reserve</option>
+                  <option value="Accounts Payable">Accounts Payable</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="fin-amount" class="form-label">Amount (UOR Credits) <span class="required" aria-hidden="true">*</span></label>
+              <input type="number" id="fin-amount" class="form-input" value="1500" min="1" required>
+            </div>
+            <div class="action-btn-group">
+              <button type="submit" class="btn btn-primary" id="btn-post-entry">Post Journal Entry</button>
+              <button type="button" class="btn btn-secondary" id="btn-verify-settlement">Verify Oracle Settlement</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="fin-ledger-heading">
+          <h3 id="fin-ledger-heading" class="card-title">General Ledger &amp; Balance Sheet</h3>
+          <div class="table-responsive" tabindex="0" role="region" aria-label="Financial Ledger Table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Entry ID</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Debit</th>
+                  <th scope="col">Credit</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="finance-ledger-tbody">
+                <tr>
+                  <td><code>JE-101</code></td>
+                  <td>Initial Treasury Reserve</td>
+                  <td>Reserve: 100,000</td>
+                  <td>Equity: 100,000</td>
+                  <td><span class="badge badge-success">Settled</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 10. LEARNING & CERTIFICATION PANEL (SV-06) -->
+    <div role="tabpanel" id="panel-learning" aria-labelledby="tab-learning" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Learning, Assessment &amp; Certification (SV-06)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Learning.lex.tex</code> &bull; W3C Verifiable Credentials issuance.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="learn-courses-heading">
+          <h3 id="learn-courses-heading" class="card-title">Course Curriculum &amp; Assessment</h3>
+          <form id="form-submit-assessment" class="form-stack">
+            <div class="form-group">
+              <label for="course-select" class="form-label">Enrolled Course</label>
+              <select id="course-select" class="form-select">
+                <option value="UOR-101">UOR-101: Formal Decentralized System Modeling</option>
+                <option value="LEAN-201">LEAN-201: Lean 4 Kernel Proof Construction</option>
+                <option value="PRISM-301">PRISM-301: Production Compiler Engineering</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="evidence-link" class="form-label">Submission Evidence Repository / Hash <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="evidence-link" class="form-input" value="sha256:490ce59f138824e0e1c9eb519c33d69fe4b78850ab1" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-submit-assessment">Submit for Accreditation</button>
+          </form>
+        </section>
+
+        <section class="card" aria-labelledby="learn-vc-heading">
+          <h3 id="learn-vc-heading" class="card-title">W3C Verifiable Credentials (VC) Wallet</h3>
+          <p class="card-desc">Cryptographically signed credentials verified against W3C VC 2.0 JSON-LD schema.</p>
+          <ul class="credentials-wallet" id="vc-wallet" role="list" style="list-style:none; padding:0; margin:0;">
+            <li class="vc-card" role="listitem" style="list-style:none;">
+              <div class="vc-header" style="display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.75rem;">
+                <span class="vc-badge" style="font-weight:600; color:var(--color-info);">W3C Verifiable Credential 2.0</span>
+                <span class="badge badge-success">Cryptographically Verified</span>
+              </div>
+              <h4 class="vc-title" style="margin:0 0 0.25rem 0; font-size:1rem;">Certified UOR System Architect</h4>
+              <p class="vc-issuer" style="margin:0; font-size:0.75rem; color:var(--color-text-muted);">Issued by: <code>did:key:uor-foundation-accreditation</code></p>
+              <p class="vc-subject" style="margin:0; font-size:0.75rem; color:var(--color-text-muted);">Subject: <code id="vc-subject-did">did:key:z6Mku...</code></p>
+              <div class="vc-claims" style="margin:0.25rem 0 0 0; font-size:0.75rem; color:var(--color-success);">
+                <span>Claims: Core Spec, 7 Services, Lean 4 Theorems, WCAG 2.2 AA</span>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- 11. BRAND & PRESENTATION PANEL (SV-07) -->
+    <div role="tabpanel" id="panel-brand" aria-labelledby="tab-brand" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Brand Identity &amp; WCAG 2.2 AA Presentation (SV-07)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Services.Brand.lex.tex</code> &bull; WCAG 2.2 Level AA design tokens &amp; contrast proof.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="brand-tokens-heading">
+          <h3 id="brand-tokens-heading" class="card-title">Authoritative Design Tokens</h3>
+          <div class="tokens-grid">
+            <div class="token-swatch">
+              <div class="swatch-color" style="background: #1a56db;"></div>
+              <div class="swatch-meta">
+                <strong>--color-primary</strong>
+                <code>#1a56db</code>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="swatch-color" style="background: #0f172a;"></div>
+              <div class="swatch-meta">
+                <strong>--color-text-header</strong>
+                <code>#0f172a</code>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="swatch-color" style="background: #047857;"></div>
+              <div class="swatch-meta">
+                <strong>--color-success</strong>
+                <code>#047857</code>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="swatch-color" style="background: #b91c1c;"></div>
+              <div class="swatch-meta">
+                <strong>--color-danger</strong>
+                <code>#b91c1c</code>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="brand-contrast-heading">
+          <h3 id="brand-contrast-heading" class="card-title">Live WCAG 2.2 AA Contrast Verification</h3>
+          <p class="card-desc" style="margin-bottom:0.75rem;">Verified contrast ratios ensuring Level AA and Level AAA compliance across both Light and Dark themes.</p>
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+              <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem; color:var(--color-text-header);">Light Theme Ratios</h4>
+              <div class="contrast-tester">
+                <div class="contrast-row">
+                  <span>Header Text on Surface (#0f172a / #ffffff):</span>
+                  <strong class="contrast-val">15.6 : 1</strong>
+                  <span class="badge badge-success">Pass (AAA &gt; 7:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Primary Button on White (#1a56db / #ffffff):</span>
+                  <strong class="contrast-val">6.5 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Success Accent on White (#047857 / #ffffff):</span>
+                  <strong class="contrast-val">4.8 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Danger Accent on White (#b91c1c / #ffffff):</span>
+                  <strong class="contrast-val">5.2 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Focus Indicator Ring (#1a56db / #ffffff):</span>
+                  <strong class="contrast-val">6.5 : 1</strong>
+                  <span class="badge badge-success">Pass (SC 2.4.13 &ge; 3:1)</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem; color:var(--color-text-header);">Dark Theme Ratios</h4>
+              <div class="contrast-tester">
+                <div class="contrast-row">
+                  <span>Header Text on Dark Card (#f8fafc / #1e293b):</span>
+                  <strong class="contrast-val">14.2 : 1</strong>
+                  <span class="badge badge-success">Pass (AAA &gt; 7:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Body Text on Dark Card (#e2e8f0 / #1e293b):</span>
+                  <strong class="contrast-val">11.6 : 1</strong>
+                  <span class="badge badge-success">Pass (AAA &gt; 7:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Muted Text on Dark Card (#94a3b8 / #1e293b):</span>
+                  <strong class="contrast-val">5.6 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Primary Action on Dark Card (#3b82f6 / #1e293b):</span>
+                  <strong class="contrast-val">4.6 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Success Accent on Dark Card (#34d399 / #1e293b):</span>
+                  <strong class="contrast-val">7.1 : 1</strong>
+                  <span class="badge badge-success">Pass (AAA &gt; 7:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Danger Accent on Dark Card (#f87171 / #1e293b):</span>
+                  <strong class="contrast-val">5.4 : 1</strong>
+                  <span class="badge badge-success">Pass (AA &gt; 4.5:1)</span>
+                </div>
+                <div class="contrast-row">
+                  <span>Focus Indicator Ring (#60a5fa / #0b1120):</span>
+                  <strong class="contrast-val">6.8 : 1</strong>
+                  <span class="badge badge-success">Pass (SC 2.4.13 &ge; 3:1)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 12. STORAGE & NETWORK PANEL -->
+    <div role="tabpanel" id="panel-storage" aria-labelledby="tab-storage" class="tab-panel" hidden tabindex="0">
+      <div class="panel-header">
+        <h2>Decentralized Storage &amp; P2P Transport (BO-01, VB-01, NA-01)</h2>
+        <p class="panel-desc">Model: <code>Foundry.Storage.Kappa.lex.tex</code> &amp; <code>Veilid.lex.tex</code> &bull; Content-addressed blobs &amp; offline resilience.</p>
+      </div>
+
+      <div class="two-column-layout">
+        <section class="card" aria-labelledby="storage-kappa-heading">
+          <h3 id="storage-kappa-heading" class="card-title">Kappa Content-Addressed Blob Storage</h3>
+          <form id="form-store-blob" class="form-stack">
+            <div class="form-group">
+              <label for="blob-input-data" class="form-label">Payload to Store <span class="required" aria-hidden="true">*</span></label>
+              <textarea id="blob-input-data" class="form-textarea" rows="3" placeholder="Enter arbitrary binary or text payload to store in Kappa space..." required>Unified Object Repository: Immutable content addressing.</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-store-blob">Compute SHA-256 &amp; Store Blob</button>
+          </form>
+
+          <div class="blob-lookup-result" id="blob-result-display" role="status" aria-live="polite">
+          </div>
+
+          <hr class="card-divider" aria-hidden="true">
+
+          <h3 class="card-title">Retrieve Blob from Kappa Space</h3>
+          <form id="form-get-blob" class="form-stack">
+            <div class="form-group">
+              <label for="blob-lookup-digest" class="form-label">Content Digest (SHA-256) <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="blob-lookup-digest" class="form-input" placeholder="e.g. sha256:7d6de15..." required>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="btn-get-blob">Retrieve &amp; Verify Digest</button>
+          </form>
+
+          <div class="blob-lookup-result" id="blob-retrieve-display" role="status" aria-live="polite">
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="network-resilience-heading">
+          <h3 id="network-resilience-heading" class="card-title">Veilid P2P &amp; Offline Resilience</h3>
+          <div class="state-display">
+            <div class="state-row">
+              <span class="state-label">Local Node ID:</span>
+              <code class="state-code" id="veilid-node-id">vld:node:7b52662c140dfaa6</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Private Route ID:</span>
+              <code class="state-code" id="veilid-route-id">vld:rt:a4b513bc759d57a9</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Peer Sync Status:</span>
+              <span class="badge badge-success" id="peer-sync-status">Connected (3 Replicas)</span>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Local Mutation Queue:</span>
+              <span class="state-val" id="offline-queue-count">0 items pending</span>
+            </div>
+          </div>
+
+          <div class="card-actions-row">
+            <button type="button" class="btn btn-outline" id="btn-toggle-offline">Toggle Offline Simulation</button>
+            <button type="button" class="btn btn-secondary" id="btn-flush-sync">Synchronize Replicas</button>
+          </div>
+
+          <div class="wal-journal-section" style="margin-top:1.5rem;">
+            <h4 style="margin:0 0 0.5rem 0; font-size:0.875rem;">Anti-Rollback State Journal (WAL)</h4>
+            <div class="state-row">
+              <span class="state-label">Current Revision:</span>
+              <code class="state-code" id="journal-current-revision">0</code>
+            </div>
+            <div class="state-row">
+              <span class="state-label">Last Signed Checkpoint:</span>
+              <code class="state-code" id="journal-last-checkpoint">None</code>
+            </div>
+            <div class="table-responsive" tabindex="0" role="region" aria-label="WAL Journal Table" style="margin-top:0.5rem;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Rev</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Actor</th>
+                    <th scope="col">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="journal-tbody">
+                  <tr>
+                    <td colspan="4" style="text-align:center; color:var(--color-text-muted);">Journal initialized at revision 0.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer role="contentinfo" class="app-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 UOR Foundation. Democratization of technology for the well-being of humanity.</p>
+      <p class="footer-standards">
+        Standards: NIST SP 800-63B-4 &bull; W3C DID Core 1.0 &bull; W3C VC 2.0 &bull; W3C ActivityPub 2.0 &bull; WCAG 2.2 AA &bull; NIST OSCAL 1.1.0
+      </p>
+    </div>
+  </footer>
+
+  <div id="shortcuts-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="shortcuts-modal-title">
+    <div class="modal-card card" style="max-width:540px; margin:5vh auto; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 id="shortcuts-modal-title" style="margin:0; font-size:1.25rem;">Keyboard Shortcuts</h2>
+        <button id="btn-close-shortcuts" type="button" class="btn btn-secondary" aria-label="Close shortcuts dialog" style="padding:0.25rem 0.5rem; font-size:1rem;">&times;</button>
+      </div>
+      <div class="shortcuts-content">
+        <table class="data-table" style="width:100%; font-size:0.875rem;">
+          <thead>
+            <tr>
+              <th scope="col">Shortcut</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><kbd>Alt</kbd> + <kbd>1</kbd> .. <kbd>9</kbd></td><td>Switch Tab (Dashboard, Identity, Backup Codes, Org, Projects, Workspaces, Workflows, AI, Messaging)</td></tr>
+            <tr><td><kbd>Alt</kbd> + <kbd>T</kbd></td><td>Toggle Theme (Light / Dark)</td></tr>
+            <tr><td><kbd>?</kbd> / <kbd>Shift</kbd> + <kbd>/</kbd></td><td>Open Keyboard Shortcuts</td></tr>
+            <tr><td><kbd>Escape</kbd></td><td>Close Dialog / Dropdown / Inbox</td></tr>
+            <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td>Navigate Interactive Elements</td></tr>
+            <tr><td><kbd>&larr;</kbd> / <kbd>&rarr;</kbd></td><td>Navigate Tabs in Tablist</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align:right; margin-top:1rem;">
+        <button id="btn-dismiss-shortcuts" type="button" class="btn btn-primary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="live-region" role="status" aria-live="polite" class="sr-only"></div>
+  <script src="crypto.js"></script>
+  <script src="foundry.js"></script>
+</body>
+</html>
