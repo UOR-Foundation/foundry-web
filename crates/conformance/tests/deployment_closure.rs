@@ -30,7 +30,7 @@ fn deployment_closure_verifies_full_acceptance_matrix_dc_01() {
     // 2. Verify closure evidence binding
     DeploymentClosureEngine::verify_closure_evidence(
         cfg,
-        "df50044df62eb0ef7ffebec2804561a9d16b5fc7",
+        "b82a770c8680d2ca142d713915bcbafe0ca74a5e",
         "https://uor-foundation.github.io/foundry-web/",
     )
     .expect("closure evidence verified against producer and publisher targets");
@@ -92,7 +92,7 @@ fn target_url_mismatch_fails_closure_evidence() {
 
     let res = DeploymentClosureEngine::verify_closure_evidence(
         cfg,
-        "df50044df62eb0ef7ffebec2804561a9d16b5fc7",
+        "b82a770c8680d2ca142d713915bcbafe0ca74a5e",
         "https://other-target.github.io/foundry-web/",
     );
     assert!(matches!(
