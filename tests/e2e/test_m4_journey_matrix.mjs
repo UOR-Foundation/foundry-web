@@ -21,34 +21,55 @@ console.log('================================================================');
 console.log('MILESTONE 5 CANONICAL 6-FILE APPLICATION JOURNEY MATRIX & WCAG AUDIT');
 console.log('================================================================');
 
-// Start Ephemeral HTTP Server serving genuine canonical 6-file browser closure
-const server = http.createServer((req, res) => {
-  const urlPath = req.url.split('?')[0];
-  let filePath = path.join(siteDir, urlPath === '/' ? 'index.html' : urlPath);
-  if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
-    filePath += '.html';
-  }
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
-    filePath = path.join(filePath, 'index.html');
-  }
-  if (!fs.existsSync(filePath)) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
-    return;
-  }
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-  res.writeHead(200, {
-    'Content-Type': contentType,
-    'Cache-Control': 'no-cache'
-  });
-  fs.createReadStream(filePath).pipe(res);
-});
+const targetEnv = process.env.TARGET_URL || process.env.PAGES_DEPLOYED_URL;
+let server = null;
+let baseUrl = null;
 
-await new Promise((resolvePromise) => server.listen(0, '127.0.0.1', resolvePromise));
-const port = server.address().port;
-const baseUrl = `http://127.0.0.1:${port}/`;
-console.log(`Ephemeral test HTTP server listening at ${baseUrl}`);
+if (targetEnv) {
+  try {
+    const probeUrl = new URL('provenance.json', targetEnv);
+    const res = await fetch(probeUrl, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      baseUrl = targetEnv.endsWith('/') ? targetEnv : targetEnv + '/';
+      console.log(`Using live target URL: ${baseUrl}`);
+    } else {
+      console.warn(`Target URL ${targetEnv} returned HTTP ${res.status} (still deploying or legacy); falling back to local ephemeral preview server.`);
+    }
+  } catch (err) {
+    console.warn(`Target URL ${targetEnv} is unreachable (${err.message}); falling back to local ephemeral preview server.`);
+  }
+}
+
+if (!baseUrl) {
+  // Start Ephemeral HTTP Server serving genuine canonical 6-file browser closure
+  server = http.createServer((req, res) => {
+    const urlPath = req.url.split('?')[0];
+    let filePath = path.join(siteDir, urlPath === '/' ? 'index.html' : urlPath);
+    if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
+      filePath += '.html';
+    }
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(filePath, 'index.html');
+    }
+    if (!fs.existsSync(filePath)) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Not Found');
+      return;
+    }
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-cache'
+    });
+    fs.createReadStream(filePath).pipe(res);
+  });
+
+  await new Promise((resolvePromise) => server.listen(0, '127.0.0.1', resolvePromise));
+  const port = server.address().port;
+  baseUrl = `http://127.0.0.1:${port}/`;
+  console.log(`Ephemeral test HTTP server listening at ${baseUrl}`);
+}
 
 let totalTests = 0;
 let passedTests = 0;
@@ -413,7 +434,7 @@ try {
     await browser.close();
   }
 } finally {
-  server.close();
+  if (server) server.close();
 }
 
 console.log('\n================================================================');

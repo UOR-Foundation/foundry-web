@@ -135,3 +135,12 @@ test('wrapper preserves byte-identical process output and invokes SDK checks in 
   assert.equal(readFileSync(join(root, 'site/index.html'), 'utf8'), 'fixture bytes, not a Foundry application');
   assert.equal(JSON.parse(readFileSync(join(root, 'reports/publication/export.json'))).schema, 'prismpm/browser-export/1');
 });
+test('actual exporter safely cleans and overwrites existing destination directory for verified producer', t => {
+  const { root, env } = sdkBoundary(t, 'none');
+  mkdirSync(join(root, 'site'));
+  writeFileSync(join(root, 'site/preexisting.txt'), 'stale artifact');
+  const result = run(root, 'site', env);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(existsSync(join(root, 'site/preexisting.txt')), false);
+  assert.equal(readFileSync(join(root, 'site/index.html'), 'utf8'), 'fixture bytes, not a Foundry application');
+});

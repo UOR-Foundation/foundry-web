@@ -23,6 +23,10 @@ fn live_acceptance_verifies_deployed_bytes_and_core_journeys_la_01() {
     assert!(cfg.policy.require_byte_for_byte_digest_matching);
     assert!(cfg.policy.require_all_core_journeys);
     assert!(cfg.policy.require_negative_and_rollback_checks);
+    assert_eq!(
+        cfg.rollback.previous_known_good_commit,
+        "83f27747d3ed434dd88b84ea3972e5798e693ddf"
+    );
 
     // 1. DEP-CHK-01: Live HTTPS DNS and Origin Resolution
     LiveAcceptanceEngine::verify_live_endpoint(
@@ -181,11 +185,30 @@ fn rollback_triggers_on_byte_mismatch() {
     let model = Model::load(&root.join("model")).expect("model loads");
     let cfg = &model.live_acceptance;
 
-    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, true, false);
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, true, false, false, false);
     assert!(res.is_ok());
-    let msg = res.unwrap();
-    assert!(msg.contains("ROLLBACK_TRIGGERED"));
-    assert!(msg.contains(&cfg.rollback.previous_known_good_commit));
+    let report = res.unwrap();
+    assert!(report.contains("ROLLBACK_TRIGGERED"));
+    assert!(report.contains("byte mismatch detected"));
+    assert!(report.contains(&cfg.rollback.previous_known_good_commit));
+    assert_eq!(
+        report.rollback_commit,
+        "83f27747d3ed434dd88b84ea3972e5798e693ddf"
+    );
+    assert!(report
+        .active_triggers
+        .contains(&repo_model::RollbackTriggerType::ByteMismatch));
+    assert!(report.client_storage_preserved);
+
+    let path = std::path::Path::new(&report.report_path);
+    assert!(
+        path.exists(),
+        "incident report JSON must exist at {}",
+        path.display()
+    );
+    let content = std::fs::read_to_string(path).expect("read incident report JSON");
+    assert!(content.contains("foundry/incident-report/1"));
+    assert!(content.contains(&cfg.rollback.previous_known_good_commit));
 }
 
 #[test]
@@ -194,11 +217,119 @@ fn rollback_triggers_on_journey_failure() {
     let model = Model::load(&root.join("model")).expect("model loads");
     let cfg = &model.live_acceptance;
 
-    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, false, true);
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, false, true, false, false);
     assert!(res.is_ok());
-    let msg = res.unwrap();
-    assert!(msg.contains("ROLLBACK_TRIGGERED"));
-    assert!(msg.contains(&cfg.rollback.previous_known_good_commit));
+    let report = res.unwrap();
+    assert!(report.contains("ROLLBACK_TRIGGERED"));
+    assert!(report.contains("core journey failure detected"));
+    assert!(report.contains(&cfg.rollback.previous_known_good_commit));
+    assert_eq!(
+        report.rollback_commit,
+        "83f27747d3ed434dd88b84ea3972e5798e693ddf"
+    );
+    assert!(report
+        .active_triggers
+        .contains(&repo_model::RollbackTriggerType::JourneyFailure));
+    assert!(std::path::Path::new(&report.report_path).exists());
+}
+
+#[test]
+fn rollback_triggers_on_security_violation() {
+    let root = repo_model::repo_root();
+    let model = Model::load(&root.join("model")).expect("model loads");
+    let cfg = &model.live_acceptance;
+
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, false, false, true, false);
+    assert!(res.is_ok());
+    let report = res.unwrap();
+    assert!(report.contains("ROLLBACK_TRIGGERED"));
+    assert!(report.contains("security/transport violation detected"));
+    assert!(report.contains(&cfg.rollback.previous_known_good_commit));
+    assert_eq!(
+        report.rollback_commit,
+        "83f27747d3ed434dd88b84ea3972e5798e693ddf"
+    );
+    assert!(report
+        .active_triggers
+        .contains(&repo_model::RollbackTriggerType::SecurityViolation));
+    assert!(std::path::Path::new(&report.report_path).exists());
+}
+
+#[test]
+fn rollback_triggers_on_accessibility_regression() {
+    let root = repo_model::repo_root();
+    let model = Model::load(&root.join("model")).expect("model loads");
+    let cfg = &model.live_acceptance;
+
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, false, false, false, true);
+    assert!(res.is_ok());
+    let report = res.unwrap();
+    assert!(report.contains("ROLLBACK_TRIGGERED"));
+    assert!(report.contains("accessibility regression detected"));
+    assert!(report.contains(&cfg.rollback.previous_known_good_commit));
+    assert_eq!(
+        report.rollback_commit,
+        "83f27747d3ed434dd88b84ea3972e5798e693ddf"
+    );
+    assert!(report
+        .active_triggers
+        .contains(&repo_model::RollbackTriggerType::AccessibilityRegression));
+    assert!(std::path::Path::new(&report.report_path).exists());
+}
+
+#[test]
+fn rollback_triggers_on_composite_failures() {
+    let root = repo_model::repo_root();
+    let model = Model::load(&root.join("model")).expect("model loads");
+    let cfg = &model.live_acceptance;
+
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, true, false, true, true);
+    assert!(res.is_ok());
+    let report = res.unwrap();
+    assert_eq!(report.active_triggers.len(), 3);
+    assert!(report.contains("byte mismatch detected"));
+    assert!(report.contains("security/transport violation detected"));
+    assert!(report.contains("accessibility regression detected"));
+}
+
+#[test]
+fn rollback_rejects_when_no_failure_condition() {
+    let root = repo_model::repo_root();
+    let model = Model::load(&root.join("model")).expect("model loads");
+    let cfg = &model.live_acceptance;
+
+    let res = LiveAcceptanceEngine::evaluate_rollback_trigger(cfg, false, false, false, false);
+    assert!(matches!(res, Err(LiveAcceptanceError::RollbackError(_))));
+    if let Err(LiveAcceptanceError::RollbackError(err)) = res {
+        assert_eq!(err, "no failure condition met to trigger rollback");
+    }
+}
+
+#[test]
+fn rollback_rejects_abbreviated_or_malformed_commit_sha() {
+    let root = repo_model::repo_root();
+    let model = Model::load(&root.join("model")).expect("model loads");
+
+    let malformed_shas = [
+        "",                                          // empty
+        "83f27747d3ed",                              // abbreviated 12-char
+        "83f27747d3ed434dd88b84ea3972e5798e693dd",   // 39 chars (under length)
+        "83f27747d3ed434dd88b84ea3972e5798e693ddfa", // 41 chars (over length)
+        "83F27747D3ED434DD88B84EA3972E5798E693DDF",  // uppercase hex
+        "83f27747d3ed434dd88b84ea3972e5798e693zzzz", // non-hex characters
+        "83f27747d3ed434dd88b84ea3972e5798e693dd ",  // trailing whitespace
+        " 83f27747d3ed434dd88b84ea3972e5798e693ddf", // leading whitespace
+    ];
+
+    for invalid_sha in malformed_shas {
+        let mut cfg = model.live_acceptance.clone();
+        cfg.rollback.previous_known_good_commit = invalid_sha.to_string();
+        let res = cfg.check();
+        assert!(
+            res.is_err(),
+            "expected LiveAcceptanceConfig::check() to fail for malformed commit SHA '{invalid_sha}'"
+        );
+    }
 }
 /// LA-01 infrastructure regression owner, not application acceptance.
 #[test]

@@ -1,5 +1,5 @@
 // Publication infrastructure only. Never generates or patches application bytes.
-import { lstatSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { lstatSync, readdirSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { regular, sdk, selectedProducer, verifyProducer, bindBrowserReceipt } from './publication-sdk.mjs';
@@ -19,10 +19,16 @@ try {
     throw new Error('Output must be one new portable directory name');
   }
   const { release } = selectedProducer();
-  try { lstatSync(output); throw new Error('Export destination already exists'); }
-  catch (error) { if (error.code !== 'ENOENT') throw error; }
-
   verifyProducer(release);
+
+  try {
+    const stat = lstatSync(output);
+    if (!stat.isDirectory()) throw new Error('Export destination exists and is not a directory');
+    rmSync(output, { recursive: true, force: true });
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+
   const receipt = sdk('export-browser', release.reference, '--output', output);
   bindBrowserReceipt(receipt, release, { output });
   if (!lstatSync(output).isDirectory()) throw new Error('Export root is not an ordinary directory');
