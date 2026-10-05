@@ -30,8 +30,9 @@ pub use deployment_policy::{
     DeploymentPolicyError, DeploymentPolicyPolicyConfig, TargetConfig,
 };
 pub use live_acceptance::{
-    LiveAcceptanceConfig, LiveAcceptanceEngine, LiveAcceptanceError, LiveAcceptancePolicyConfig,
-    LiveCheckRecord, LiveTargetConfig, RollbackConfig,
+    IncidentReport, LiveAcceptanceConfig, LiveAcceptanceEngine, LiveAcceptanceError,
+    LiveAcceptancePolicyConfig, LiveCheckRecord, LiveTargetConfig, RollbackConfig,
+    RollbackTriggerType,
 };
 pub use pages_state::{
     ArtifactVerificationConfig, DeploymentTargetConfig, HttpsEnforcementConfig, PagesStateConfig,
